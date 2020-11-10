@@ -10,7 +10,7 @@ resources:
 
 variables:
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '7b0ec93b-680d-46ec-88bf-43cbad4835ed'
+  dockerRegistryServiceConnection: 'atlasms'
   imageRepository: 'atlas-wrg'
   containerRegistry: 'atlasms.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
