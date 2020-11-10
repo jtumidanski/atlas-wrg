@@ -4,12 +4,14 @@ COPY settings.xml /usr/share/maven/conf/
 
 COPY pom.xml pom.xml
 COPY wrg-api/pom.xml wrg-api/pom.xml
+COPY wrg-model/pom.xml wrg-model/pom.xml
 COPY wrg-base/pom.xml wrg-base/pom.xml
 
 RUN mvn dependency:go-offline package -B
 
 ## copy the pom and src code to the container
 COPY wrg-api/src wrg-api/src
+COPY wrg-model/src wrg-model/src
 COPY wrg-base/src wrg-base/src
 
 RUN mvn install

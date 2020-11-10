@@ -9,8 +9,9 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>wrg-base</module>
         <module>wrg-api</module>
+        <module>wrg-model</module>
+        <module>wrg-base</module>
     </modules>
 
     <build>
