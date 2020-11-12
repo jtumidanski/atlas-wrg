@@ -1,0 +1,147 @@
+worlds:
+  #Properties for Scania 0
+  - name: Scania
+    flag: Nothing
+    serverMessage: Welcome to Scania!
+    eventMessage: Scania!
+    whyAmIRecommended: Welcome to Scania!
+
+    #Properties for Bera 1
+  - name: Bera
+    flag: Nothing
+    serverMessage: Welcome to Bera!
+    eventMessage: Bera!
+    whyAmIRecommended: Welcome to Bera!
+
+    #Properties for Broa 2
+  - name: Broa
+    flag: Nothing
+    serverMessage: Welcome to Broa!
+    eventMessage: Broa!
+    whyAmIRecommended: Welcome to Broa!
+
+    #Properties for Windia 3
+  - name: Windia
+    flag: Nothing
+    serverMessage: Welcome to Windia!
+    eventMessage: Windia!
+    whyAmIRecommended: Welcome to Windia!
+
+    #Properties for Khaini 4
+  - name: Khaini
+    flag: Nothing
+    serverMessage: Welcome to Khaini!
+    eventMessage: Khaini!
+    whyAmIRecommended: Welcome to Khaini!
+
+    #Properties for Bellocan 5
+  - name: Bellocan
+    flag: Nothing
+    serverMessage: Welcome to Bellocan!
+    eventMessage: Bellocan!
+    whyAmIRecommended: Welcome to Bellocan!
+
+    #Properties for Mardia 6
+  - name: Mardia
+    flag: Nothing
+    serverMessage: Welcome to Mardia!
+    eventMessage: Mardia!
+    whyAmIRecommended: Welcome to Mardia!
+
+    #Properties for Kradia 7
+  - name: Kradia
+    flag: Nothing
+    serverMessage: Welcome to Kradia!
+    eventMessage: Kradia!
+    whyAmIRecommended: Welcome to Kradia!
+
+    #Properties for Yellonde 8
+  - name: Yellonde
+    flag: Nothing
+    serverMessage: Welcome to Yellonde!
+    eventMessage: Yellonde!
+    whyAmIRecommended: Welcome to Yellonde!
+
+    #Properties for Demethos 9
+  - name: Demethos
+    flag: Nothing
+    serverMessage: Welcome to Demethos!
+    eventMessage: Demethos!
+    whyAmIRecommended: Welcome to Demethos!
+
+    #Properties for Galicia 10
+  - name: Galicia
+    flag: Nothing
+    serverMessage: Welcome to Galicia!
+    eventMessage: Galicia!
+    whyAmIRecommended: Welcome to Galicia!
+
+    #Properties for El Nido 11
+  - name: Nido
+    flag: Nothing
+    serverMessage: Welcome to El Nido!
+    eventMessage: El Nido!
+    whyAmIRecommended: Welcome to El Nido!
+
+    #Properties for Zenith 12
+  - name: Zenith
+    flag: Nothing
+    serverMessage: Welcome to Zenith!
+    eventMessage: Zenith!
+    whyAmIRecommended: Welcome to Zenith!
+
+    #Properties for Arcenia 13
+  - name: Arcenia
+    flag: Nothing
+    serverMessage: Welcome to Arcenia!
+    eventMessage: Arcenia!
+    whyAmIRecommended: Welcome to Arcenia!
+
+    #Properties for Kastia 14
+  - name: Kastia
+    flag: Nothing
+    serverMessage: Welcome to Kastia!
+    eventMessage: Kastia!
+    whyAmIRecommended: Welcome to Kastia!
+
+    #Properties for Judis 15
+  - name: Judis
+    flag: Nothing
+    serverMessage: Welcome to Judis!
+    eventMessage: Judis!
+    whyAmIRecommended: Welcome to Judis!
+
+    #Properties for Plana 16
+  - name: Plana
+    flag: Nothing
+    serverMessage: Welcome to Plana!
+    eventMessage: Plana!
+    whyAmIRecommended: Welcome to Plana!
+
+    #Properties for Kalluna 17
+  - name: Kalluna
+    flag: Nothing
+    serverMessage: Welcome to Kalluna!
+    eventMessage: Kalluna!
+    whyAmIRecommended: Welcome to Kalluna!
+
+    #Properties for Stius 18
+  - name: Stius
+    flag: Nothing
+    serverMessage: Welcome to Stius!
+    eventMessage: Stius!
+    whyAmIRecommended: Welcome to Stius!
+
+    #Properties for Croa 19
+  - name: Croa
+    flag: Nothing
+    serverMessage: Welcome to Croa!
+    eventMessage: Croa!
+    whyAmIRecommended: Welcome to Croa!
+
+    #Properties for Medere 20
+  - name: Medere
+    flag: Nothing
+    serverMessage: Welcome to Medere!
+    eventMessage: Medere!
+    whyAmIRecommended: Welcome to Medere!

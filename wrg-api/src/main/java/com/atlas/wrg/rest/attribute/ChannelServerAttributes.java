@@ -5,12 +5,6 @@ import rest.AttributeResult;
 public class ChannelServerAttributes implements AttributeResult {
    private Integer worldId;
 
-   private String worldName;
-
-   private String flag;
-
-   private String eventMessage;
-
    private Integer channelId;
 
    private Integer capacity;
@@ -21,30 +15,6 @@ public class ChannelServerAttributes implements AttributeResult {
 
    public void setWorldId(Integer worldId) {
       this.worldId = worldId;
-   }
-
-   public String getWorldName() {
-      return worldName;
-   }
-
-   public void setWorldName(String worldName) {
-      this.worldName = worldName;
-   }
-
-   public String getFlag() {
-      return flag;
-   }
-
-   public void setFlag(String flag) {
-      this.flag = flag;
-   }
-
-   public String getEventMessage() {
-      return eventMessage;
-   }
-
-   public void setEventMessage(String eventMessage) {
-      this.eventMessage = eventMessage;
    }
 
    public Integer getChannelId() {

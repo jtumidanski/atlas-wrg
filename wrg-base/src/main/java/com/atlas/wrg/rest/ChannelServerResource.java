@@ -12,6 +12,9 @@ import javax.ws.rs.core.Response;
 
 import com.atlas.wrg.ChannelServerRegistry;
 import com.atlas.wrg.model.ChannelServer;
+import com.atlas.wrg.model.WorldFlags;
+import com.atlas.wrg.processor.ChannelServerProcessor;
+import com.atlas.wrg.processor.ConfigurationProcessor;
 import com.atlas.wrg.rest.attribute.ChannelServerAttributes;
 import com.atlas.wrg.rest.builder.ChannelServerAttributesBuilder;
 
@@ -49,15 +52,14 @@ public class ChannelServerResource {
    }
 
    protected ResultObjectBuilder produceResult(ChannelServer channelServer) {
+      ChannelServerAttributesBuilder builder = new ChannelServerAttributesBuilder()
+            .setWorldId(channelServer.worldId())
+            .setChannelId(channelServer.channelId());
+
+      int channelLoad = ChannelServerProcessor.getInstance().getLoad(channelServer.worldId(), channelServer.channelId());
+      builder.setCapacity(channelLoad);
+
       return new ResultObjectBuilder(ChannelServerAttributes.class, channelServer.uniqueId())
-            .setAttribute(new ChannelServerAttributesBuilder()
-                  .setWorldId(channelServer.worldId())
-                  .setWorldName("Scania")
-                  .setEventMessage("None")
-                  .setFlag("HOT")
-                  .setChannelId(channelServer.channelId())
-                  //.setCapacity(ChannelServerProcessor.getInstance().getLoad(channelServer.worldId(), ))
-                  .setCapacity(0)
-            );
+            .setAttribute(builder);
    }
 }
