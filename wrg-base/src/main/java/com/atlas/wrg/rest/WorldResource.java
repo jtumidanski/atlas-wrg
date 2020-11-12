@@ -11,6 +11,7 @@ import com.atlas.wrg.ChannelServerRegistry;
 import com.atlas.wrg.model.ChannelServer;
 import com.atlas.wrg.model.WorldFlags;
 import com.atlas.wrg.processor.ConfigurationProcessor;
+import com.atlas.wrg.processor.WorldProcessor;
 import com.atlas.wrg.rest.attribute.WorldAttributes;
 import com.atlas.wrg.rest.builder.WorldAttributesBuilder;
 
@@ -43,13 +44,16 @@ public class WorldResource {
                               worldFlags = WorldFlags.NOTHING;
                            }
 
+                           Integer capacityStatus = WorldProcessor.getInstance().getCapacityStatus(worldId);
+
                            WorldAttributesBuilder builder = new WorldAttributesBuilder()
                                  .setName(configuration.name)
                                  .setFlag(worldFlags.getValue())
                                  .setMessage(configuration.serverMessage)
                                  .setEventMessage(configuration.eventMessage)
                                  .setRecommended(!configuration.whyAmIRecommended.equals(""))
-                                 .setRecommendedMessage(configuration.whyAmIRecommended);
+                                 .setRecommendedMessage(configuration.whyAmIRecommended)
+                                 .setCapacityStatus(capacityStatus);
                            resultBuilder.addData(new ResultObjectBuilder(WorldAttributes.class, worldId).setAttribute(builder));
                         }));
       return resultBuilder.build();

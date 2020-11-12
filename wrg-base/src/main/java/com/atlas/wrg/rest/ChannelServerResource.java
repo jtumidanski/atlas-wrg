@@ -12,9 +12,7 @@ import javax.ws.rs.core.Response;
 
 import com.atlas.wrg.ChannelServerRegistry;
 import com.atlas.wrg.model.ChannelServer;
-import com.atlas.wrg.model.WorldFlags;
 import com.atlas.wrg.processor.ChannelServerProcessor;
-import com.atlas.wrg.processor.ConfigurationProcessor;
 import com.atlas.wrg.rest.attribute.ChannelServerAttributes;
 import com.atlas.wrg.rest.builder.ChannelServerAttributesBuilder;
 

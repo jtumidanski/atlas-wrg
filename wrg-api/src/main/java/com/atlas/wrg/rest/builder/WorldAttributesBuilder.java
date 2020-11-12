@@ -39,4 +39,8 @@ public class WorldAttributesBuilder extends Builder<WorldAttributes, WorldAttrib
    public WorldAttributesBuilder setRecommendedMessage(String recommendedMessage) {
       return add(attr -> attr.setRecommendedMessage(recommendedMessage));
    }
+
+   public WorldAttributesBuilder setCapacityStatus(Integer capacityStatus) {
+      return add(attr -> attr.setCapacityStatus(capacityStatus));
+   }
 }

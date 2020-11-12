@@ -15,6 +15,8 @@ public class WorldAttributes implements AttributeResult {
 
    private String recommendedMessage;
 
+   private Integer capacityStatus;
+
    public String getName() {
       return name;
    }
@@ -61,5 +63,13 @@ public class WorldAttributes implements AttributeResult {
 
    public void setRecommendedMessage(String recommendedMessage) {
       this.recommendedMessage = recommendedMessage;
+   }
+
+   public Integer getCapacityStatus() {
+      return capacityStatus;
+   }
+
+   public void setCapacityStatus(Integer capacityStatus) {
+      this.capacityStatus = capacityStatus;
    }
 }
