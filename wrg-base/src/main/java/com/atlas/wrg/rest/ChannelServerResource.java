@@ -52,6 +52,12 @@ public class ChannelServerResource {
       return new ResultObjectBuilder(ChannelServerAttributes.class, channelServer.uniqueId())
             .setAttribute(new ChannelServerAttributesBuilder()
                   .setWorldId(channelServer.worldId())
-                  .setChannelId(channelServer.channelId()));
+                  .setWorldName("Scania")
+                  .setEventMessage("None")
+                  .setFlag("HOT")
+                  .setChannelId(channelServer.channelId())
+                  //.setCapacity(ChannelServerProcessor.getInstance().getLoad(channelServer.worldId(), ))
+                  .setCapacity(0)
+            );
    }
 }
