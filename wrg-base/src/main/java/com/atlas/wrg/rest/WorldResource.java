@@ -3,6 +3,7 @@ package com.atlas.wrg.rest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -30,32 +31,45 @@ public class WorldResource {
       ChannelServerRegistry.getInstance().getChannelServers().stream()
             .map(ChannelServer::worldId)
             .distinct()
-            .forEach(worldId ->
-                  ConfigurationProcessor.getInstance()
-                        .getWorldConfiguration(worldId)
-                        .ifPresent(configuration -> {
-                           WorldFlags worldFlags;
-                           try {
-                              worldFlags = WorldFlags.valueOf(configuration.flag.toUpperCase());
-                           } catch (IllegalArgumentException exception) {
-                              System.out
-                                    .println("Unable to process world flag configuration for world " + worldId + " "
-                                          + "defaulting to Nothing");
-                              worldFlags = WorldFlags.NOTHING;
-                           }
-
-                           Integer capacityStatus = WorldProcessor.getInstance().getCapacityStatus(worldId);
-
-                           WorldAttributesBuilder builder = new WorldAttributesBuilder()
-                                 .setName(configuration.name)
-                                 .setFlag(worldFlags.getValue())
-                                 .setMessage(configuration.serverMessage)
-                                 .setEventMessage(configuration.eventMessage)
-                                 .setRecommended(!configuration.whyAmIRecommended.equals(""))
-                                 .setRecommendedMessage(configuration.whyAmIRecommended)
-                                 .setCapacityStatus(capacityStatus);
-                           resultBuilder.addData(new ResultObjectBuilder(WorldAttributes.class, worldId).setAttribute(builder));
-                        }));
+            .forEach(worldId -> populateResultBuilderForWorld(resultBuilder, worldId));
       return resultBuilder.build();
+   }
+
+   @GET
+   @Path("/{worldId}")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response getWorldInformation(@PathParam("worldId") Integer worldId) {
+      ResultBuilder resultBuilder = new ResultBuilder();
+      populateResultBuilderForWorld(resultBuilder, worldId);
+      return resultBuilder.build();
+   }
+
+   protected void populateResultBuilderForWorld(ResultBuilder resultBuilder, Integer worldId) {
+      ConfigurationProcessor.getInstance()
+            .getWorldConfiguration(worldId)
+            .ifPresent(configuration -> {
+               WorldFlags worldFlags;
+               try {
+                  worldFlags = WorldFlags.valueOf(configuration.flag.toUpperCase());
+               } catch (IllegalArgumentException exception) {
+                  System.out
+                        .println("Unable to process world flag configuration for world " + worldId + " "
+                              + "defaulting to Nothing");
+                  worldFlags = WorldFlags.NOTHING;
+               }
+
+               Integer capacityStatus = WorldProcessor.getInstance().getCapacityStatus(worldId);
+
+               WorldAttributesBuilder builder = new WorldAttributesBuilder()
+                     .setName(configuration.name)
+                     .setFlag(worldFlags.getValue())
+                     .setMessage(configuration.serverMessage)
+                     .setEventMessage(configuration.eventMessage)
+                     .setRecommended(!configuration.whyAmIRecommended.equals(""))
+                     .setRecommendedMessage(configuration.whyAmIRecommended)
+                     .setCapacityStatus(capacityStatus);
+               resultBuilder.addData(new ResultObjectBuilder(WorldAttributes.class, worldId).setAttribute(builder));
+            });
    }
 }
