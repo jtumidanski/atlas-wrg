@@ -62,4 +62,14 @@ public class ChannelServerRegistry {
    public List<ChannelServer> getChannelServers() {
       return Collections.unmodifiableList(channelServerList);
    }
+
+   public void removeChannelServer(Integer id) {
+      synchronized (registryLock) {
+         ChannelServer channelServer = channelServerList.stream()
+               .filter(possible -> possible.uniqueId() == id)
+               .findFirst()
+               .orElseThrow();
+         channelServerList.remove(channelServer);
+      }
+   }
 }

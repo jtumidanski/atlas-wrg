@@ -3,9 +3,11 @@ package com.atlas.wrg.rest;
 import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -47,6 +49,15 @@ public class ChannelServerResource {
          resultBuilder.addData(produceResult(channelServer.get()));
       }
       return resultBuilder.build();
+   }
+
+   @DELETE
+   @Path("/{id}")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response registerChannelServer(@PathParam("id") Integer id) {
+      ChannelServerRegistry.getInstance().removeChannelServer(id);
+      return new ResultBuilder(Response.Status.NO_CONTENT).build();
    }
 
    protected ResultObjectBuilder produceResult(ChannelServer channelServer) {
