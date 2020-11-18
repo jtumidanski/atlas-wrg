@@ -7,11 +7,11 @@ import builder.AttributeResultBuilder;
 
 public class ChannelServerAttributesBuilder extends RecordBuilder<ChannelServerAttributes, ChannelServerAttributesBuilder>
       implements AttributeResultBuilder {
-   private int worldId;
+   private Integer worldId;
 
-   private int channelId;
+   private Integer channelId;
 
-   private int capacity;
+   private Integer capacity;
 
    @Override
    public ChannelServerAttributes construct() {
@@ -23,17 +23,17 @@ public class ChannelServerAttributesBuilder extends RecordBuilder<ChannelServerA
       return this;
    }
 
-   public ChannelServerAttributesBuilder setWorldId(int worldId) {
+   public ChannelServerAttributesBuilder setWorldId(Integer worldId) {
       this.worldId = worldId;
       return getThis();
    }
 
-   public ChannelServerAttributesBuilder setChannelId(int channelId) {
+   public ChannelServerAttributesBuilder setChannelId(Integer channelId) {
       this.channelId = channelId;
       return getThis();
    }
 
-   public ChannelServerAttributesBuilder setCapacity(int capacity) {
+   public ChannelServerAttributesBuilder setCapacity(Integer capacity) {
       this.capacity = capacity;
       return getThis();
    }

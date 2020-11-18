@@ -9,17 +9,17 @@ public class WorldAttributesBuilder extends RecordBuilder<WorldAttributes, World
       implements AttributeResultBuilder {
    private String name;
 
-   private int flag;
+   private Integer flag;
 
    private String message;
 
    private String eventMessage;
 
-   private boolean recommended;
+   private Boolean recommended;
 
    private String recommendedMessage;
 
-   private int capacityStatus;
+   private Integer capacityStatus;
 
    @Override
    public WorldAttributes construct() {
@@ -36,7 +36,7 @@ public class WorldAttributesBuilder extends RecordBuilder<WorldAttributes, World
       return getThis();
    }
 
-   public WorldAttributesBuilder setFlag(int flag) {
+   public WorldAttributesBuilder setFlag(Integer flag) {
       this.flag = flag;
       return getThis();
    }
@@ -51,7 +51,7 @@ public class WorldAttributesBuilder extends RecordBuilder<WorldAttributes, World
       return getThis();
    }
 
-   public WorldAttributesBuilder setRecommended(boolean recommended) {
+   public WorldAttributesBuilder setRecommended(Boolean recommended) {
       this.recommended = recommended;
       return getThis();
    }
@@ -61,7 +61,7 @@ public class WorldAttributesBuilder extends RecordBuilder<WorldAttributes, World
       return getThis();
    }
 
-   public WorldAttributesBuilder setCapacityStatus(int capacityStatus) {
+   public WorldAttributesBuilder setCapacityStatus(Integer capacityStatus) {
       this.capacityStatus = capacityStatus;
       return getThis();
    }
