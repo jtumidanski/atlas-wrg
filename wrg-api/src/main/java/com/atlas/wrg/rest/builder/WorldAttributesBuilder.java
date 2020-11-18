@@ -1,28 +1,29 @@
 package com.atlas.wrg.rest.builder;
 
-import builder.AttributeResultBuilder;
-import builder.RecordBuilder;
+import com.app.common.builder.RecordBuilder;
 import com.atlas.wrg.rest.attribute.WorldAttributes;
 
-public class WorldAttributesBuilder extends RecordBuilder<WorldAttributes, WorldAttributesBuilder> implements AttributeResultBuilder {
-   private static final String NAME = "NAME";
+import builder.AttributeResultBuilder;
 
-   private static final String FLAG = "FLAG";
+public class WorldAttributesBuilder extends RecordBuilder<WorldAttributes, WorldAttributesBuilder>
+      implements AttributeResultBuilder {
+   private String name;
 
-   private static final String MESSAGE = "MESSAGE";
+   private int flag;
 
-   private static final String EVENT_MESSAGE = "EVENT_MESSAGE";
+   private String message;
 
-   private static final String RECOMMENDED = "RECOMMENDED";
+   private String eventMessage;
 
-   private static final String RECOMMENDED_MESSAGE = "RECOMMENDED_MESSAGE";
+   private boolean recommended;
 
-   private static final String CAPACITY_STATUS = "CAPACITY_STATUS";
+   private String recommendedMessage;
 
+   private int capacityStatus;
 
    @Override
    public WorldAttributes construct() {
-      return new WorldAttributes(get(NAME), get(FLAG), get(MESSAGE), get(EVENT_MESSAGE), get(RECOMMENDED), get(RECOMMENDED_MESSAGE), get(CAPACITY_STATUS));
+      return new WorldAttributes(name, flag, message, eventMessage, recommended, recommendedMessage, capacityStatus);
    }
 
    @Override
@@ -31,30 +32,37 @@ public class WorldAttributesBuilder extends RecordBuilder<WorldAttributes, World
    }
 
    public WorldAttributesBuilder setName(String name) {
-      return set(NAME, name);
+      this.name = name;
+      return getThis();
    }
 
    public WorldAttributesBuilder setFlag(int flag) {
-      return set(FLAG, flag);
+      this.flag = flag;
+      return getThis();
    }
 
    public WorldAttributesBuilder setMessage(String message) {
-      return set(MESSAGE, message);
+      this.message = message;
+      return getThis();
    }
 
    public WorldAttributesBuilder setEventMessage(String eventMessage) {
-      return set(EVENT_MESSAGE, eventMessage);
+      this.eventMessage = eventMessage;
+      return getThis();
    }
 
    public WorldAttributesBuilder setRecommended(boolean recommended) {
-      return set(RECOMMENDED, recommended);
+      this.recommended = recommended;
+      return getThis();
    }
 
    public WorldAttributesBuilder setRecommendedMessage(String recommendedMessage) {
-      return set(RECOMMENDED_MESSAGE, recommendedMessage);
+      this.recommendedMessage = recommendedMessage;
+      return getThis();
    }
 
    public WorldAttributesBuilder setCapacityStatus(int capacityStatus) {
-      return set(CAPACITY_STATUS, capacityStatus);
+      this.capacityStatus = capacityStatus;
+      return getThis();
    }
 }
