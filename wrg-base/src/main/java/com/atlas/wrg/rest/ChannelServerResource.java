@@ -40,8 +40,8 @@ public class ChannelServerResource {
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
    public Response registerChannelServer(InputBody<ChannelServerAttributes> inputBody) {
-      int worldId = inputBody.attribute(ChannelServerAttributes::getWorldId);
-      int channelId = inputBody.attribute(ChannelServerAttributes::getChannelId);
+      int worldId = inputBody.attribute(ChannelServerAttributes::worldId);
+      int channelId = inputBody.attribute(ChannelServerAttributes::channelId);
       Optional<ChannelServer> channelServer = ChannelServerRegistry.getInstance().addChannelServer(worldId, channelId);
       ResultBuilder resultBuilder = new ResultBuilder(Response.Status.CONFLICT);
       if (channelServer.isPresent()) {

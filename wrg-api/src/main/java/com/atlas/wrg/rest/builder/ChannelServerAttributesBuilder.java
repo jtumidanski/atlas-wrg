@@ -1,15 +1,20 @@
 package com.atlas.wrg.rest.builder;
 
+import builder.AttributeResultBuilder;
+import builder.RecordBuilder;
 import com.atlas.wrg.rest.attribute.ChannelServerAttributes;
 
-import builder.AttributeResultBuilder;
-import builder.Builder;
+public class ChannelServerAttributesBuilder extends RecordBuilder<ChannelServerAttributes, ChannelServerAttributesBuilder> implements AttributeResultBuilder {
+   private static final String WORLD_ID = "WORLD_ID";
 
-public class ChannelServerAttributesBuilder extends Builder<ChannelServerAttributes, ChannelServerAttributesBuilder>
-      implements AttributeResultBuilder {
+   private static final String CHANNEL_ID = "CHANNEL_ID";
+
+   private static final String CAPACITY = "CAPACITY";
+
+
    @Override
    public ChannelServerAttributes construct() {
-      return new ChannelServerAttributes();
+      return new ChannelServerAttributes(get(WORLD_ID), get(CHANNEL_ID), get(CAPACITY));
    }
 
    @Override
@@ -17,15 +22,15 @@ public class ChannelServerAttributesBuilder extends Builder<ChannelServerAttribu
       return this;
    }
 
-   public ChannelServerAttributesBuilder setWorldId(Integer worldId) {
-      return add(attr -> attr.setWorldId(worldId));
+   public ChannelServerAttributesBuilder setWorldId(int worldId) {
+      return set(WORLD_ID, worldId);
    }
 
-   public ChannelServerAttributesBuilder setChannelId(Integer channelId) {
-      return add(attr -> attr.setChannelId(channelId));
+   public ChannelServerAttributesBuilder setChannelId(int channelId) {
+      return set(CHANNEL_ID, channelId);
    }
 
-   public ChannelServerAttributesBuilder setCapacity(Integer capacity) {
-      return add(attr -> attr.setCapacity(capacity));
+   public ChannelServerAttributesBuilder setCapacity(int capacity) {
+      return set(CAPACITY, capacity);
    }
 }
