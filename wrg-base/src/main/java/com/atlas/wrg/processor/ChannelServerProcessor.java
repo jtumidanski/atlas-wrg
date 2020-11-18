@@ -36,7 +36,7 @@ public class ChannelServerProcessor {
             .result()
             .map(DataContainer::getData)
             .map(DataBody::getAttributes)
-            .map(ChannelLoadAttributes::getLoad)
+            .map(ChannelLoadAttributes::load)
             .orElse(0);
    }
 }
