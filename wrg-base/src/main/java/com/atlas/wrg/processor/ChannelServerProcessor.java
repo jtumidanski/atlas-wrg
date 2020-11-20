@@ -28,8 +28,8 @@ public class ChannelServerProcessor {
 
    public int getLoad(int worldId, int channelId) {
       return UriBuilder.service(RestService.CHANNEL)
-            .path("worlds").path(worldId)
-            .path("channels").path(channelId)
+            .pathParam("worlds", worldId)
+            .pathParam("channels", channelId)
             .path("load")
             .getRestClient(ChannelLoadAttributes.class)
             .getWithResponse()

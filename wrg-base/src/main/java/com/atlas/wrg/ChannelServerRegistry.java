@@ -18,7 +18,7 @@ public class ChannelServerRegistry {
 
    private final AtomicInteger runningUniqueId = new AtomicInteger(1000000001);
 
-   private List<ChannelServer> channelServerList = new ArrayList<>();
+   private final List<ChannelServer> channelServerList = new ArrayList<>();
 
    public static ChannelServerRegistry getInstance() {
       ChannelServerRegistry result = instance;
@@ -65,11 +65,10 @@ public class ChannelServerRegistry {
 
    public void removeChannelServer(Integer id) {
       synchronized (registryLock) {
-         ChannelServer channelServer = channelServerList.stream()
+         channelServerList.stream()
                .filter(possible -> possible.uniqueId() == id)
                .findFirst()
-               .orElseThrow();
-         channelServerList.remove(channelServer);
+               .ifPresent(channelServerList::remove);
       }
    }
 }
