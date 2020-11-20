@@ -34,7 +34,7 @@ public class ChannelServerRegistry {
       return result;
    }
 
-   public Optional<ChannelServer> addChannelServer(int worldId, int channelId) {
+   public Optional<ChannelServer> addChannelServer(int worldId, int channelId, String ipAddress, int port) {
       synchronized (registryLock) {
          boolean alreadyExists = channelServerList.stream()
                .anyMatch(server -> server.worldId() == worldId && server.channelId() == channelId);
@@ -53,7 +53,7 @@ public class ChannelServerRegistry {
             }
          } while (existingIds.contains(currentUniqueId));
 
-         ChannelServer channelServer = new ChannelServer(currentUniqueId, worldId, channelId);
+         ChannelServer channelServer = new ChannelServer(currentUniqueId, worldId, channelId, ipAddress, port);
          channelServerList.add(channelServer);
          return Optional.of(channelServer);
       }

@@ -42,7 +42,10 @@ public class ChannelServerResource {
    public Response registerChannelServer(InputBody<ChannelServerAttributes> inputBody) {
       int worldId = inputBody.attribute(ChannelServerAttributes::worldId);
       int channelId = inputBody.attribute(ChannelServerAttributes::channelId);
-      Optional<ChannelServer> channelServer = ChannelServerRegistry.getInstance().addChannelServer(worldId, channelId);
+      String ipAddress = inputBody.attribute(ChannelServerAttributes::ipAddress);
+      int port = inputBody.attribute(ChannelServerAttributes::port);
+      Optional<ChannelServer> channelServer = ChannelServerRegistry.getInstance()
+            .addChannelServer(worldId, channelId, ipAddress, port);
       ResultBuilder resultBuilder = new ResultBuilder(Response.Status.CONFLICT);
       if (channelServer.isPresent()) {
          resultBuilder = new ResultBuilder(Response.Status.CREATED);
@@ -63,7 +66,9 @@ public class ChannelServerResource {
    protected ResultObjectBuilder produceResult(ChannelServer channelServer) {
       ChannelServerAttributesBuilder builder = new ChannelServerAttributesBuilder()
             .setWorldId(channelServer.worldId())
-            .setChannelId(channelServer.channelId());
+            .setChannelId(channelServer.channelId())
+            .setIpAddress(channelServer.ipAddress())
+            .setPort(channelServer.port());
 
       int channelLoad = ChannelServerProcessor.getInstance().getLoad(channelServer.worldId(), channelServer.channelId());
       builder.setCapacity(channelLoad);

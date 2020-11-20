@@ -13,9 +13,13 @@ public class ChannelServerAttributesBuilder extends RecordBuilder<ChannelServerA
 
    private Integer capacity;
 
+   private String ipAddress;
+
+   private Integer port;
+
    @Override
    public ChannelServerAttributes construct() {
-      return new ChannelServerAttributes(worldId, channelId, capacity);
+      return new ChannelServerAttributes(worldId, channelId, capacity, ipAddress, port);
    }
 
    @Override
@@ -35,6 +39,16 @@ public class ChannelServerAttributesBuilder extends RecordBuilder<ChannelServerA
 
    public ChannelServerAttributesBuilder setCapacity(Integer capacity) {
       this.capacity = capacity;
+      return getThis();
+   }
+
+   public ChannelServerAttributesBuilder setIpAddress(String ipAddress) {
+      this.ipAddress = ipAddress;
+      return getThis();
+   }
+
+   public ChannelServerAttributesBuilder setPort(Integer port) {
+      this.port = port;
       return getThis();
    }
 }
