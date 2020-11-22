@@ -1,6 +1,6 @@
 package com.atlas.wrg.processor;
 
-import com.atlas.csrv.attribute.ChannelLoadAttributes;
+import com.atlas.csrv.rest.attribute.ChannelLoadAttributes;
 import com.atlas.shared.rest.RestService;
 import com.atlas.shared.rest.UriBuilder;
 

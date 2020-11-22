@@ -71,4 +71,14 @@ public class ChannelServerRegistry {
                .ifPresent(channelServerList::remove);
       }
    }
+
+   public void removeChannelServer(int worldId, int channelId) {
+      synchronized (registryLock) {
+         channelServerList.stream()
+               .filter(possible -> possible.worldId() == worldId)
+               .filter(possible -> possible.channelId() == channelId)
+               .findFirst()
+               .ifPresent(channelServerList::remove);
+      }
+   }
 }
