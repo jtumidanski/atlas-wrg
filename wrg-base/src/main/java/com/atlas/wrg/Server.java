@@ -9,11 +9,13 @@ import com.atlas.shared.rest.RestService;
 import com.atlas.shared.rest.UriBuilder;
 
 public class Server {
-
    private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
    public static void main(String[] args) {
-      executorService.execute(new ChannelServerEventConsumer());
+      String bootstrapServers = System.getenv("BOOTSTRAP_SERVERS");
+      String channelServiceTopic = System.getenv("TOPIC_CHANNEL_SERVICE");
+
+      executorService.execute(new ChannelServerEventConsumer(bootstrapServers, channelServiceTopic));
 
       URI uri = UriBuilder.host(RestService.WORLD_REGISTRY).uri();
       RestServerFactory.create(uri, "com.atlas.wrg.rest");
