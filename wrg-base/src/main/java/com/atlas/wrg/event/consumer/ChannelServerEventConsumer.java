@@ -1,11 +1,12 @@
 package com.atlas.wrg.event.consumer;
 
+import com.atlas.csrv.constant.EventConstants;
 import com.atlas.csrv.event.ChannelServerEvent;
 import com.atlas.csrv.event.ChannelServerEventStatus;
-import com.atlas.kafka.consumer.ConsumerRecordHandler;
+import com.atlas.kafka.consumer.SimpleEventHandler;
 import com.atlas.wrg.ChannelServerRegistry;
 
-public class ChannelServerEventConsumer implements ConsumerRecordHandler<Long, ChannelServerEvent> {
+public class ChannelServerEventConsumer implements SimpleEventHandler<ChannelServerEvent> {
    @Override
    public void handle(Long key, ChannelServerEvent event) {
       if (event.status() == ChannelServerEventStatus.STARTED) {
@@ -13,5 +14,25 @@ public class ChannelServerEventConsumer implements ConsumerRecordHandler<Long, C
       } else if (event.status() == ChannelServerEventStatus.SHUTDOWN) {
          ChannelServerRegistry.getInstance().removeChannelServer(event.worldId(), event.channelId());
       }
+   }
+
+   @Override
+   public Class<ChannelServerEvent> getEventClass() {
+      return ChannelServerEvent.class;
+   }
+
+   @Override
+   public String getConsumerId() {
+      return "World Registry";
+   }
+
+   @Override
+   public String getBootstrapServers() {
+      return System.getenv("BOOTSTRAP_SERVERS");
+   }
+
+   @Override
+   public String getTopic() {
+      return System.getenv(EventConstants.TOPIC_CHANNEL_SERVICE);
    }
 }
