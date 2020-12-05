@@ -81,4 +81,11 @@ public class ChannelServerRegistry {
                .ifPresent(channelServerList::remove);
       }
    }
+
+   public Optional<ChannelServer> getChannelServer(int worldId, int channelId) {
+      return getChannelServers().stream()
+            .filter(server -> server.worldId() == worldId)
+            .filter(server -> server.channelId() == channelId)
+            .findFirst();
+   }
 }

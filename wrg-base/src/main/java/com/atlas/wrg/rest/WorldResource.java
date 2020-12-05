@@ -42,4 +42,16 @@ public class WorldResource {
             .orElse(new ResultBuilder(Response.Status.NOT_FOUND))
             .build();
    }
+
+   @GET
+   @Path("/{worldId}/channels/{channelId}")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response getRegisteredChannelServer(@PathParam("worldId") Integer worldId, @PathParam("channelId") Integer channelId) {
+      return ChannelServerRegistry.getInstance().getChannelServer(worldId, channelId)
+            .map(ResultObjectFactory::create)
+            .map(Mappers::singleOkResult)
+            .orElse(new ResultBuilder(Response.Status.NOT_FOUND))
+            .build();
+   }
 }
