@@ -5,6 +5,7 @@ import com.atlas.csrv.event.ChannelServerEvent;
 import com.atlas.csrv.event.ChannelServerEventStatus;
 import com.atlas.kafka.consumer.SimpleEventHandler;
 import com.atlas.wrg.ChannelServerRegistry;
+import com.atlas.wrg.processor.TopicDiscoveryProcessor;
 
 public class ChannelServerEventConsumer implements SimpleEventHandler<ChannelServerEvent> {
    @Override
@@ -33,6 +34,6 @@ public class ChannelServerEventConsumer implements SimpleEventHandler<ChannelSer
 
    @Override
    public String getTopic() {
-      return System.getenv(EventConstants.TOPIC_CHANNEL_SERVICE);
+      return TopicDiscoveryProcessor.getTopic(EventConstants.TOPIC_CHANNEL_SERVICE);
    }
 }

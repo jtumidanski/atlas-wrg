@@ -79,6 +79,11 @@
         </dependency>
         <dependency>
             <groupId>atlas</groupId>
+            <artifactId>tds-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>atlas</groupId>
             <artifactId>csrv-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
