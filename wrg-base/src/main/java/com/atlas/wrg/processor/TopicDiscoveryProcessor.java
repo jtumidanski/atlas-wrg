@@ -17,7 +17,7 @@ public final class TopicDiscoveryProcessor {
             .retryOnFailure(1000)
             .getWithResponse()
             .result()
-            .map(DataContainer::getData)
+            .flatMap(DataContainer::data)
             .map(DataBody::getAttributes)
             .map(TopicAttributes::name)
             .orElseThrow();

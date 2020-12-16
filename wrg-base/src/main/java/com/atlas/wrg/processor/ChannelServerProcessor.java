@@ -34,7 +34,7 @@ public class ChannelServerProcessor {
             .getRestClient(ChannelLoadAttributes.class)
             .getWithResponse()
             .result()
-            .map(DataContainer::getData)
+            .flatMap(DataContainer::data)
             .map(DataBody::getAttributes)
             .map(ChannelLoadAttributes::load)
             .orElse(0);
