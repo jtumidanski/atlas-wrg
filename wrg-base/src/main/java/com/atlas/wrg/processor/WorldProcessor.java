@@ -7,27 +7,12 @@ import com.atlas.wrg.ChannelServerRegistry;
 import com.atlas.wrg.model.ChannelServer;
 import com.atlas.wrg.model.ServerStatus;
 
-public class WorldProcessor {
-   private static final Object lock = new Object();
-
-   private static volatile WorldProcessor instance;
-
-   public static WorldProcessor getInstance() {
-      WorldProcessor result = instance;
-      if (result == null) {
-         synchronized (lock) {
-            result = instance;
-            if (result == null) {
-               result = new WorldProcessor();
-               instance = result;
-            }
-         }
-      }
-      return result;
+public final class WorldProcessor {
+   private WorldProcessor() {
    }
 
-   public Integer getCapacityStatus(int worldId) {
-      List<ChannelServer> channelServers = ChannelServerRegistry.getInstance().getChannelServers().stream()
+   public static Integer getCapacityStatus(int worldId) {
+      List<ChannelServer> channelServers = ChannelServerRegistry.getInstance().getChannelServers()
             .filter(channelServer -> channelServer.worldId() == worldId)
             .collect(Collectors.toList());
       int channelCount = channelServers.size();
@@ -36,7 +21,7 @@ public class WorldProcessor {
       int max = 100;
       int cap = channelCount * max;
       int count = channelServers.stream()
-            .mapToInt(channelServer -> ChannelServerProcessor.getInstance().getLoad(worldId, channelServer.channelId()))
+            .mapToInt(channelServer -> ChannelServerProcessor.getLoad(worldId, channelServer.channelId()))
             .sum();
 
       ServerStatus serverStatus;

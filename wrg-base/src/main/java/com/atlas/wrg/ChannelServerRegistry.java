@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.atlas.wrg.model.ChannelServer;
 
@@ -59,8 +60,8 @@ public class ChannelServerRegistry {
       }
    }
 
-   public List<ChannelServer> getChannelServers() {
-      return Collections.unmodifiableList(channelServerList);
+   public Stream<ChannelServer> getChannelServers() {
+      return Collections.unmodifiableList(channelServerList).stream();
    }
 
    public void removeChannelServer(Integer id) {
@@ -83,7 +84,7 @@ public class ChannelServerRegistry {
    }
 
    public Optional<ChannelServer> getChannelServer(int worldId, int channelId) {
-      return getChannelServers().stream()
+      return getChannelServers()
             .filter(server -> server.worldId() == worldId)
             .filter(server -> server.channelId() == channelId)
             .findFirst();

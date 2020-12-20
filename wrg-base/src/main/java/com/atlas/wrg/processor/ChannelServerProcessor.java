@@ -7,26 +7,11 @@ import com.atlas.shared.rest.UriBuilder;
 import rest.DataBody;
 import rest.DataContainer;
 
-public class ChannelServerProcessor {
-   private static final Object lock = new Object();
-
-   private static volatile ChannelServerProcessor instance;
-
-   public static ChannelServerProcessor getInstance() {
-      ChannelServerProcessor result = instance;
-      if (result == null) {
-         synchronized (lock) {
-            result = instance;
-            if (result == null) {
-               result = new ChannelServerProcessor();
-               instance = result;
-            }
-         }
-      }
-      return result;
+public final class ChannelServerProcessor {
+   private ChannelServerProcessor() {
    }
 
-   public int getLoad(int worldId, int channelId) {
+   public static int getLoad(int worldId, int channelId) {
       return UriBuilder.service(RestService.CHANNEL)
             .pathParam("worlds", worldId)
             .pathParam("channels", channelId)

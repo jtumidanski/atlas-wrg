@@ -1,4 +1,4 @@
-package com.atlas.wrg.processor;
+package com.atlas.wrg;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -10,20 +10,20 @@ import com.atlas.wrg.configuration.Configuration;
 import com.atlas.wrg.configuration.WorldConfiguration;
 import com.esotericsoftware.yamlbeans.YamlReader;
 
-public class ConfigurationProcessor {
+public class ConfigurationRegistry {
    private static final Object lock = new Object();
 
-   private static volatile ConfigurationProcessor instance;
+   private static volatile ConfigurationRegistry instance;
 
    private final Configuration configuration;
 
-   public static ConfigurationProcessor getInstance() {
-      ConfigurationProcessor result = instance;
+   public static ConfigurationRegistry getInstance() {
+      ConfigurationRegistry result = instance;
       if (result == null) {
          synchronized (lock) {
             result = instance;
             if (result == null) {
-               result = new ConfigurationProcessor();
+               result = new ConfigurationRegistry();
                instance = result;
             }
          }
@@ -31,7 +31,7 @@ public class ConfigurationProcessor {
       return result;
    }
 
-   private ConfigurationProcessor() {
+   private ConfigurationRegistry() {
       String fileName = "/service/config.yaml";
       String message;
       try {

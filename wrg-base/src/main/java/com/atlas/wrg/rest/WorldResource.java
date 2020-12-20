@@ -23,7 +23,7 @@ public class WorldResource {
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
    public Response getWorldInformation() {
-      return ChannelServerRegistry.getInstance().getChannelServers().stream()
+      return ChannelServerRegistry.getInstance().getChannelServers()
             .map(ChannelServer::worldId)
             .distinct()
             .map(ResultObjectFactory::create)
@@ -39,7 +39,7 @@ public class WorldResource {
    public Response getWorldInformation(@PathParam("worldId") Integer worldId) {
       return ResultObjectFactory.create(worldId)
             .map(Mappers::singleOkResult)
-            .orElse(new ResultBuilder(Response.Status.NOT_FOUND))
+            .orElseGet(ResultBuilder::notFound)
             .build();
    }
 
@@ -51,7 +51,7 @@ public class WorldResource {
       return ChannelServerRegistry.getInstance().getChannelServer(worldId, channelId)
             .map(ResultObjectFactory::create)
             .map(Mappers::singleOkResult)
-            .orElse(new ResultBuilder(Response.Status.NOT_FOUND))
+            .orElseGet(ResultBuilder::notFound)
             .build();
    }
 }

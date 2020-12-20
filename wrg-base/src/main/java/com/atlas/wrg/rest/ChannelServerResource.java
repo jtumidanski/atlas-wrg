@@ -27,13 +27,13 @@ public class ChannelServerResource {
    @Produces(MediaType.APPLICATION_JSON)
    public Response getRegisteredChannelServers(@QueryParam("world") Integer worldId) {
       if (worldId != null) {
-         return ChannelServerRegistry.getInstance().getChannelServers().stream()
+         return ChannelServerRegistry.getInstance().getChannelServers()
                .filter(channelServer -> channelServer.worldId() == worldId)
                .map(ResultObjectFactory::create)
                .collect(Collectors.toResultBuilder())
                .build();
       } else {
-         return ChannelServerRegistry.getInstance().getChannelServers().stream()
+         return ChannelServerRegistry.getInstance().getChannelServers()
                .map(ResultObjectFactory::create)
                .collect(Collectors.toResultBuilder())
                .build();
