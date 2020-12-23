@@ -1,6 +1,7 @@
 package com.atlas.wrg.rest;
 
-import builder.ResultObjectBuilder;
+import java.util.Optional;
+
 import com.atlas.wrg.ConfigurationRegistry;
 import com.atlas.wrg.configuration.WorldConfiguration;
 import com.atlas.wrg.model.ChannelServer;
@@ -12,11 +13,11 @@ import com.atlas.wrg.rest.attribute.WorldAttributes;
 import com.atlas.wrg.rest.builder.ChannelServerAttributesBuilder;
 import com.atlas.wrg.rest.builder.WorldAttributesBuilder;
 
-import java.util.Optional;
+import builder.ResultObjectBuilder;
 
 public final class ResultObjectFactory {
    public static ResultObjectBuilder create(ChannelServer channelServer) {
-      int channelLoad = ChannelServerProcessor.getLoad(channelServer.worldId(), channelServer.channelId());
+      int channelLoad = ChannelServerProcessor.getLoad(channelServer.worldId(), channelServer.channelId()).join();
       return new ResultObjectBuilder(ChannelServerAttributes.class, channelServer.uniqueId())
             .setAttribute(new ChannelServerAttributesBuilder()
                   .setWorldId(channelServer.worldId())
