@@ -3,8 +3,8 @@ package com.atlas.wrg.processor;
 import java.util.concurrent.CompletableFuture;
 
 import com.app.rest.util.RestResponseUtil;
+import com.atlas.csrv.constant.RestConstants;
 import com.atlas.csrv.rest.attribute.ChannelLoadAttributes;
-import com.atlas.shared.rest.RestService;
 import com.atlas.shared.rest.UriBuilder;
 
 import rest.DataBody;
@@ -15,7 +15,7 @@ public final class ChannelServerProcessor {
    }
 
    protected static CompletableFuture<DataContainer<ChannelLoadAttributes>> requestChannelLoad(int worldId, int channelId) {
-      return UriBuilder.service(RestService.CHANNEL)
+      return UriBuilder.service(RestConstants.SERVICE)
             .pathParam("worlds", worldId)
             .pathParam("channels", channelId)
             .path("load")
