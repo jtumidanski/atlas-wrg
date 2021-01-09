@@ -14,7 +14,7 @@ COPY wrg-api/src wrg-api/src
 COPY wrg-model/src wrg-model/src
 COPY wrg-base/src wrg-base/src
 
-RUN mvn install
+RUN mvn install -Prunnable
 
 FROM openjdk:14-ea-jdk-alpine
 USER root
