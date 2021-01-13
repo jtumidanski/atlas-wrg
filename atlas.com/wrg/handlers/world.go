@@ -65,7 +65,7 @@ func (w *World) GetChannel(wr http.ResponseWriter, r *http.Request) {
 //	200: worldServerResponse
 //  404: notFoundResponse
 
-// GetChannel handles GET requests
+// GetWorld handles GET requests
 func (w *World) GetWorld(rw http.ResponseWriter, r *http.Request) {
 	worldId := readByte(r, "worldId")
 	var response attributes.WorldDataContainer
@@ -103,7 +103,7 @@ func getWorldResponseObject(worldId byte) attributes.WorldData {
 // responses:
 //	200: worldServersResponse
 
-// GetChannel handles GET requests
+// GetWorlds handles GET requests
 func (w *World) GetWorlds(rw http.ResponseWriter, _ *http.Request) {
 	var response attributes.WorldListDataContainer
 	response.Data = make([]attributes.WorldData, 0)

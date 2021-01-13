@@ -18,7 +18,7 @@ func main() {
 }
 
 func handleRequests() {
-	l := log.New(os.Stdout, "products-api ", log.LstdFlags)
+	l := log.New(os.Stdout, "wrg ", log.LstdFlags)
 
 	router := mux.NewRouter().StrictSlash(true).PathPrefix("/ms/wrg").Subrouter()
 	router.Use(commonHeader)
