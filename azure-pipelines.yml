@@ -23,25 +23,11 @@ stages:
       - job: Build
         displayName: Build and Deploy Artifacts
         pool:
-          vmImage: 'macos-latest'
+          vmImage: 'ubuntu-latest'
         steps:
-          - task: MavenAuthenticate@0
-            inputs:
-              artifactsFeeds: 'JustinTumidanski'
-              mavenServiceConnections: 'maven'
-          - task: Maven@3
-            inputs:
-              mavenPomFile: 'pom.xml'
-              goals: 'compile deploy'
-              publishJUnitResults: false
-              javaHomeOption: 'JDKVersion'
-              mavenVersionOption: 'Default'
-              mavenAuthenticateFeed: false
-              effectivePomSkip: false
-              sonarQubeRunAnalysis: false
-            env:
-              JAVA_HOME: $(JAVA_HOME_14_X64)
-              PATH: $(JAVA_HOME_14_X64)/bin:$(PATH)
+              - task: Go@0
+                inputs:
+                  command: 'build'
 #  - stage: BuildDocker
 #    displayName: Build and Push Docker Image
 #    jobs:
