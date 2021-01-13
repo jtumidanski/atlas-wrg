@@ -15,15 +15,22 @@
 package handlers
 
 import (
-	"atlas-wrg2/attributes"
-	"atlas-wrg2/configurations"
-	"atlas-wrg2/models"
-	"atlas-wrg2/registries"
-	"encoding/json"
+	"atlas-wrg/attributes"
+	"atlas-wrg/configurations"
+	"atlas-wrg/models"
+	"atlas-wrg/registries"
 	"log"
 	"net/http"
 	"strconv"
 )
+
+type World struct {
+	l *log.Logger
+}
+
+func NewWorld(l *log.Logger) *World {
+	return &World{l}
+}
 
 // swagger:route GET /worlds/{worldId}/channels/{channelId} worlds getChannelServer
 // Retrieves channel server information for a worlds channel.
@@ -32,22 +39,22 @@ import (
 //  404: notFoundResponse
 
 // GetChannel handles GET requests
-func GetChannel(w http.ResponseWriter, r *http.Request) {
+func (w *World) GetChannel(wr http.ResponseWriter, r *http.Request) {
 	worldId := readByte(r, "worldId")
 	channelId := readByte(r, "channelId")
 
 	server := registries.GetChannelRegistry().ChannelServer(worldId, channelId)
 	if server == nil {
-		w.WriteHeader(http.StatusNotFound)
+		wr.WriteHeader(http.StatusNotFound)
 		return
 	}
 
 	var response attributes.ChannelServerDataContainer
 	response.Data = getChannelResponseObject(*server)
-	err := json.NewEncoder(w).Encode(response)
+	err := attributes.ToJSON(response, wr)
 	if err != nil {
 		log.Println("Error writing GetChannel output")
-		w.WriteHeader(http.StatusInternalServerError)
+		wr.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 }
@@ -59,15 +66,15 @@ func GetChannel(w http.ResponseWriter, r *http.Request) {
 //  404: notFoundResponse
 
 // GetChannel handles GET requests
-func GetWorld(w http.ResponseWriter, r *http.Request) {
+func (w *World) GetWorld(rw http.ResponseWriter, r *http.Request) {
 	worldId := readByte(r, "worldId")
 	var response attributes.WorldDataContainer
 	response.Data = getWorldResponseObject(worldId)
 
-	err := json.NewEncoder(w).Encode(response)
+	err := attributes.ToJSON(response, rw)
 	if err != nil {
 		log.Println("Error writing GetWorld output")
-		w.WriteHeader(http.StatusInternalServerError)
+		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 }
@@ -97,7 +104,7 @@ func getWorldResponseObject(worldId byte) attributes.WorldData {
 //	200: worldServersResponse
 
 // GetChannel handles GET requests
-func GetWorlds(w http.ResponseWriter, _ *http.Request) {
+func (w *World) GetWorlds(rw http.ResponseWriter, _ *http.Request) {
 	var response attributes.WorldListDataContainer
 	response.Data = make([]attributes.WorldData, 0)
 
@@ -106,10 +113,10 @@ func GetWorlds(w http.ResponseWriter, _ *http.Request) {
 		response.Data = append(response.Data, getWorldResponseObject(id))
 	}
 
-	err := json.NewEncoder(w).Encode(response)
+	err := attributes.ToJSON(response, rw)
 	if err != nil {
-		log.Println("Error writing GetWorlds output")
-		w.WriteHeader(http.StatusInternalServerError)
+		w.l.Println("Error writing GetWorlds output")
+		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 }

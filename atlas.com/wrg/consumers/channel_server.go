@@ -1,9 +1,9 @@
 package consumers
 
 import (
-	"atlas-wrg2/attributes"
-	"atlas-wrg2/events"
-	"atlas-wrg2/registries"
+	"atlas-wrg/attributes"
+	"atlas-wrg/events"
+	"atlas-wrg/registries"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 )
 
 func Consume(ctx context.Context) {
@@ -31,7 +32,7 @@ func Consume(ctx context.Context) {
 	}
 
 	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers: []string{"atlas-kafka:9092"},
+		Brokers: []string{os.Getenv("BOOTSTRAP_SERVERS")},
 		Topic:   response.Data.Attributes.Name,
 		GroupID: "World Registry",
 	})

@@ -1,7 +1,7 @@
 package registries
 
 import (
-	"atlas-wrg2/models"
+	"atlas-wrg/models"
 	"sync"
 )
 

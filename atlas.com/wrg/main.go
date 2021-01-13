@@ -1,14 +1,14 @@
 package main
 
 import (
-	"atlas-wrg2/consumers"
-	"atlas-wrg2/handlers"
+	"atlas-wrg/consumers"
+	"atlas-wrg/handlers"
 	"context"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-	"strings"
+	"os"
 )
 
 func main() {
@@ -18,34 +18,27 @@ func main() {
 }
 
 func handleRequests() {
-	router := mux.NewRouter().StrictSlash(true)
+	l := log.New(os.Stdout, "products-api ", log.LstdFlags)
+
+	router := mux.NewRouter().StrictSlash(true).PathPrefix("/ms/wrg").Subrouter()
 	router.Use(commonHeader)
-	router.HandleFunc("/ms/wrg/channelServers", handlers.GetChannelServers).Methods("GET")
-	router.HandleFunc("/ms/wrg/channelServers", handlers.RegisterChannelServer).Methods("POST")
-	router.HandleFunc("/ms/wrg/channelServers/{id}", handlers.UnregisterChannelServer).Methods("DELETE")
-	router.HandleFunc("/ms/wrg/worlds", handlers.GetWorlds).Methods("GET")
-	router.HandleFunc("/ms/wrg/worlds/{worldId}", handlers.GetWorld).Methods("GET")
-	router.HandleFunc("/ms/wrg/worlds/{worldId}/channels/{channelId}", handlers.GetChannel).Methods("GET")
+	router.Handle("/docs", middleware.Redoc(middleware.RedocOpts{BasePath: "/ms/wrg", SpecURL: "/ms/wrg/swagger.yaml"}, nil))
+	router.Handle("/swagger.yaml", http.StripPrefix("/ms/wrg", http.FileServer(http.Dir("/"))))
 
-	ops := middleware.RedocOpts{BasePath: "/ms/wrg", SpecURL: "/ms/wrg/swagger.yaml"}
-	sh := middleware.Redoc(ops, nil)
-	router.Handle("/ms/wrg/docs", sh)
+	cs := handlers.NewChannelServer(l)
+	csRouter := router.PathPrefix("/channelServers").Subrouter()
+	csRouter.HandleFunc("/", cs.GetChannelServers).Methods("GET")
+	csRouter.Handle("/", cs.MiddlewareValidateChannelServer(cs.RegisterChannelServer)).Methods("POST")
+	csRouter.HandleFunc("/{channelId}", cs.UnregisterChannelServer).Methods("DELETE")
 
-	rewrite := func(path string) string {
-		// your rewrite code, returns the new path
-		return strings.ReplaceAll(path, "/ms/wrg", "")
-	}
-
-	fileServer := http.FileServer(http.Dir("/"))
-	router.HandleFunc("/ms/wrg/swagger.yaml", func(w http.ResponseWriter, r *http.Request) {
-		r.URL.Path = rewrite(r.URL.Path)
-		fileServer.ServeHTTP(w, r)
-	})
+	w := handlers.NewWorld(l)
+	wRouter := router.PathPrefix("/worlds").Subrouter()
+	wRouter.HandleFunc("/", w.GetWorlds).Methods("GET")
+	wRouter.HandleFunc("/{worldId}", w.GetWorld).Methods("GET")
+	wRouter.HandleFunc("/{worldId}/channels/{channelId}", w.GetChannel).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
-
-
 
 func commonHeader(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

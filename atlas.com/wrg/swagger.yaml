@@ -24,7 +24,7 @@ definitions:
         type: integer
         x-go-name: WorldId
     type: object
-    x-go-package: _/Users/jtumidanski/Documents/Projects/atlas/atlas-wrg2/atlas.com/wrg/attributes
+    x-go-package: _/Users/jtumidanski/Documents/Projects/atlas/atlas-wrg/atlas.com/wrg/attributes
   ChannelServerData:
     properties:
       attributes:
@@ -36,7 +36,7 @@ definitions:
         type: string
         x-go-name: Type
     type: object
-    x-go-package: _/Users/jtumidanski/Documents/Projects/atlas/atlas-wrg2/atlas.com/wrg/attributes
+    x-go-package: _/Users/jtumidanski/Documents/Projects/atlas/atlas-wrg/atlas.com/wrg/attributes
   worldServerAttributes:
     properties:
       capacityStatus:
@@ -64,7 +64,7 @@ definitions:
         x-go-name: RecommendedMessage
     type: object
     x-go-name: WorldAttributes
-    x-go-package: _/Users/jtumidanski/Documents/Projects/atlas/atlas-wrg2/atlas.com/wrg/attributes
+    x-go-package: _/Users/jtumidanski/Documents/Projects/atlas/atlas-wrg/atlas.com/wrg/attributes
   worldServerData:
     properties:
       attributes:
@@ -77,7 +77,7 @@ definitions:
         x-go-name: Type
     type: object
     x-go-name: WorldData
-    x-go-package: _/Users/jtumidanski/Documents/Projects/atlas/atlas-wrg2/atlas.com/wrg/attributes
+    x-go-package: _/Users/jtumidanski/Documents/Projects/atlas/atlas-wrg/atlas.com/wrg/attributes
 info:
   description: Documentation for World API
   title: of World API

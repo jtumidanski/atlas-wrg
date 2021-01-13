@@ -26,3 +26,8 @@ func readByte(r *http.Request, param string) byte {
 	}
 	return byte(value)
 }
+
+// GenericError is a generic error message returned by a server
+type GenericError struct {
+	Message string `json:"message"`
+}

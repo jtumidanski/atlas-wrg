@@ -15,26 +15,36 @@
 package handlers
 
 import (
-	"atlas-wrg2/attributes"
-	"atlas-wrg2/models"
-	"atlas-wrg2/registries"
-	"encoding/json"
-	"io/ioutil"
+	"atlas-wrg/attributes"
+	"atlas-wrg/models"
+	"atlas-wrg/registries"
 	"log"
 	"net/http"
 	"strconv"
 )
 
-// swagger:route DELETE /channelServers/{id} channelServers unregister
+// KeyChannelServer is a key used for the ChannelServer object in the context
+type KeyChannelServer struct{}
+
+// Channel Servers handler for getting and updating channel servers
+type ChannelServer struct {
+	l *log.Logger
+}
+
+func NewChannelServer(l *log.Logger) *ChannelServer {
+	return &ChannelServer{l}
+}
+
+// swagger:route DELETE /channelServers/{channelId} channelServers unregister
 // Removes channel server registration from the world registry
 // responses:
 //	204: noContentResponse
 
 // GetChannelServers handles DELETE requests
-func UnregisterChannelServer(w http.ResponseWriter, r *http.Request) {
-	uniqueId := readInt(r, "id")
+func (c *ChannelServer) UnregisterChannelServer(rw http.ResponseWriter, r *http.Request) {
+	uniqueId := readInt(r, "channelId")
 	registries.GetChannelRegistry().Remove(uniqueId)
-	w.WriteHeader(http.StatusNoContent)
+	rw.WriteHeader(http.StatusNoContent)
 }
 
 // swagger:route POST /channelServers channelServers register
@@ -43,31 +53,17 @@ func UnregisterChannelServer(w http.ResponseWriter, r *http.Request) {
 //	200: channelServerResponse
 
 // GetChannelServers handles POST requests
-func RegisterChannelServer(w http.ResponseWriter, r *http.Request) {
-	reqBody, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		log.Println("Error reading RegisterChannelServer input")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	var input attributes.InputChannelServer
-	err = json.Unmarshal(reqBody, &input)
-	if err != nil {
-		log.Println("Error parsing RegisterChannelServer input")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
+func (c *ChannelServer) RegisterChannelServer(rw http.ResponseWriter, r *http.Request) {
+	input := r.Context().Value(KeyChannelServer{}).(attributes.InputChannelServer)
 	server := registries.GetChannelRegistry().Register(input.Data.Attributes.WorldId,
 		input.Data.Attributes.ChannelId, input.Data.Attributes.IpAddress, input.Data.Attributes.Port)
 
 	var response attributes.ChannelServerDataContainer
 	response.Data = getChannelResponseObject(server)
-	err = json.NewEncoder(w).Encode(response)
+	err := attributes.ToJSON(response, rw)
 	if err != nil {
-		log.Println("Error writing RegisterChannelServer response")
-		w.WriteHeader(http.StatusInternalServerError)
+		c.l.Println("Error writing RegisterChannelServer response")
+		rw.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 }
@@ -92,7 +88,7 @@ func getChannelResponseObject(server models.ChannelServer) attributes.ChannelSer
 //	200: channelServersResponse
 
 // GetChannelServers handles GET requests
-func GetChannelServers(w http.ResponseWriter, _ *http.Request) {
+func (c *ChannelServer) GetChannelServers(rw http.ResponseWriter, _ *http.Request) {
 	var response attributes.ChannelServerListDataContainer
 	response.Data = make([]attributes.ChannelServerData, 0)
 
@@ -101,9 +97,9 @@ func GetChannelServers(w http.ResponseWriter, _ *http.Request) {
 		response.Data = append(response.Data, serverData)
 	}
 
-	err := json.NewEncoder(w).Encode(response)
+	err := attributes.ToJSON(response, rw)
 	if err != nil {
-		log.Println("Error encoding GetChannelServers response")
-		w.WriteHeader(http.StatusInternalServerError)
+		c.l.Println("Error encoding GetChannelServers response")
+		rw.WriteHeader(http.StatusInternalServerError)
 	}
 }
