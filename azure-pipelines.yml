@@ -28,6 +28,7 @@ stages:
               - task: Go@0
                 inputs:
                   command: 'build'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/atlas.com/wrg/'
 #  - stage: BuildDocker
 #    displayName: Build and Push Docker Image
 #    jobs:
