@@ -9,7 +9,7 @@ FROM golang:alpine3.12 AS build-env
 # either manually or with a tool like "godep".)
 RUN apk add --no-cache git
 
-ADD . /atlas.com/wrg
+ADD ./atlas.com/wrg /atlas.com/wrg
 WORKDIR /atlas.com/wrg
 
 RUN go build -o /server
@@ -24,7 +24,7 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /
 
 COPY --from=build-env /server /
-COPY config.yaml /
-COPY swagger.yaml /
+COPY /atlas.com/wrg/config.yaml /
+COPY /atlas.com/wrg/swagger.yaml /
 
 CMD ["/server"]

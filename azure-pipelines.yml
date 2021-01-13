@@ -13,7 +13,7 @@ variables:
   dockerRegistryServiceConnection: 'atlasms'
   imageRepository: 'atlas-wrg'
   containerRegistry: 'atlasms.azurecr.io'
-  dockerfilePath: '$(Build.SourcesDirectory)/atlas.com/wrg/Dockerfile'
+  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
 
 stages:

@@ -13,7 +13,7 @@ RUN apk add --no-cache git
 
 RUN go get github.com/derekparker/delve/cmd/dlv
 
-ADD . /atlas.com/wrg
+ADD ./atlas.com/wrg /atlas.com/wrg
 WORKDIR /atlas.com/wrg
 
 RUN go build -gcflags="all=-N -l" -o /server
@@ -30,8 +30,8 @@ WORKDIR /
 
 COPY --from=build-env /server /
 COPY --from=build-env /go/bin/dlv /
-COPY config.yaml /
-COPY swagger.yaml /
+COPY /atlas.com/wrg/config.yaml /
+COPY /atlas.com/wrg/swagger.yaml /
 
 # Run delve
 CMD ["/dlv", "--listen=:40000", "--headless=true", "--api-version=2", "--accept-multiclient", "exec", "/server"]
