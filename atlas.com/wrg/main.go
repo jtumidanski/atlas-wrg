@@ -12,13 +12,14 @@ import (
 )
 
 func main() {
-	ctx := context.Background()
-	go consumers.Consume(ctx)
-	handleRequests()
+	l := log.New(os.Stdout, "wrg ", log.LstdFlags)
+
+	cs := consumers.NewChannelServer(l, context.Background())
+	go cs.Init()
+	handleRequests(l)
 }
 
-func handleRequests() {
-	l := log.New(os.Stdout, "wrg ", log.LstdFlags)
+func handleRequests(l *log.Logger) {
 
 	router := mux.NewRouter().StrictSlash(true).PathPrefix("/ms/wrg").Subrouter()
 	router.Use(commonHeader)
@@ -37,7 +38,7 @@ func handleRequests() {
 	wRouter.HandleFunc("/{worldId}", w.GetWorld).Methods("GET")
 	wRouter.HandleFunc("/{worldId}/channels/{channelId}", w.GetChannel).Methods("GET")
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	l.Fatal(http.ListenAndServe(":8080", router))
 }
 
 func commonHeader(next http.Handler) http.Handler {

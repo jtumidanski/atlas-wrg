@@ -14,6 +14,10 @@ type WorldDataContainer struct {
 	Data WorldData `json:"data"`
 }
 
+func NewWorldDataContainer(wd WorldData) *WorldDataContainer {
+	return &WorldDataContainer{wd}
+}
+
 // swagger:model worldServerData
 type WorldData struct {
 	Id         string          `json:"id"`

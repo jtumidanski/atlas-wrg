@@ -53,7 +53,7 @@ func (w *World) GetChannel(wr http.ResponseWriter, r *http.Request) {
 	response.Data = getChannelResponseObject(*server)
 	err := attributes.ToJSON(response, wr)
 	if err != nil {
-		log.Println("Error writing GetChannel output")
+		w.l.Println("Error writing GetChannel output")
 		wr.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -68,22 +68,35 @@ func (w *World) GetChannel(wr http.ResponseWriter, r *http.Request) {
 // GetWorld handles GET requests
 func (w *World) GetWorld(rw http.ResponseWriter, r *http.Request) {
 	worldId := readByte(r, "worldId")
-	var response attributes.WorldDataContainer
-	response.Data = getWorldResponseObject(worldId)
 
-	err := attributes.ToJSON(response, rw)
+	rd, err := w.getWorldResponseObject(worldId)
 	if err != nil {
-		log.Println("Error writing GetWorld output")
-		rw.WriteHeader(http.StatusInternalServerError)
+		rw.WriteHeader(http.StatusNotFound)
 		return
+	}
+
+	response := attributes.NewWorldDataContainer(*rd)
+
+	err = attributes.ToJSON(response, rw)
+	if err != nil {
+		w.l.Println("Error writing GetWorld output")
+		rw.WriteHeader(http.StatusInternalServerError)
 	}
 }
 
-func getWorldResponseObject(worldId byte) attributes.WorldData {
-	c, _ := configurations.GetConfiguration()
-	wc, _ := c.GetWorldConfiguration(worldId)
+func (w *World) getWorldResponseObject(worldId byte) (*attributes.WorldData, error) {
+	c, err := configurations.NewConfigurator(w.l).GetConfiguration()
+	if err != nil {
+		return nil, err
+	}
 
-	return attributes.WorldData{
+	wc, err := c.GetWorldConfiguration(worldId)
+	if err != nil {
+
+		return nil, err
+	}
+
+	return &attributes.WorldData{
 		Id:   strconv.Itoa(int(worldId)),
 		Type: "com.atlas.wrg.rest.attribute.WorldAttributes",
 		Attributes: attributes.WorldAttributes{
@@ -95,7 +108,7 @@ func getWorldResponseObject(worldId byte) attributes.WorldData {
 			RecommendedMessage: wc.WhyAmIRecommended,
 			CapacityStatus:     0,
 		},
-	}
+	}, nil
 }
 
 // swagger:route GET /worlds worlds getWorlds
@@ -110,7 +123,12 @@ func (w *World) GetWorlds(rw http.ResponseWriter, _ *http.Request) {
 
 	worldIds := mapDistinctWorldId(registries.GetChannelRegistry().ChannelServers())
 	for _, id := range worldIds {
-		response.Data = append(response.Data, getWorldResponseObject(id))
+		rd, err := w.getWorldResponseObject(id)
+		if err != nil {
+			rw.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		response.Data = append(response.Data, *rd)
 	}
 
 	err := attributes.ToJSON(response, rw)

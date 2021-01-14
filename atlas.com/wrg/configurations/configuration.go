@@ -1,10 +1,20 @@
 package configurations
 
 import (
+	"errors"
+	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 )
+
+type Configurator struct {
+	l *log.Logger
+}
+
+func NewConfigurator(l *log.Logger) *Configurator {
+	return &Configurator{l}
+}
 
 type Configuration struct {
 	Worlds []WorldConfiguration `yaml:"worlds"`
@@ -18,28 +28,28 @@ type WorldConfiguration struct {
 	WhyAmIRecommended string `yaml:"whyAmIRecommended"`
 }
 
-func GetConfiguration() (*Configuration, error) {
-
+func (c *Configurator) GetConfiguration() (*Configuration, error) {
 	yamlFile, err := ioutil.ReadFile("config.yaml")
 	if err != nil {
-		log.Printf("yamlFile.Get err   #%v ", err)
+		c.l.Printf("yamlFile.Get err   #%v ", err)
 		return nil, err
 	}
 
-	c := &Configuration{}
-	err = yaml.Unmarshal(yamlFile, c)
+	con := &Configuration{}
+	err = yaml.Unmarshal(yamlFile, con)
 	if err != nil {
-		log.Fatalf("Unmarshal: %v", err)
+		c.l.Fatalf("Unmarshal: %v", err)
 		return nil, err
 	}
 
-	return c, nil
+	return con, nil
 }
 
 func (c Configuration) GetWorldConfiguration(index byte) (*WorldConfiguration, error) {
-	w := &WorldConfiguration{}
 	if len(c.Worlds) > 0 && index < byte(len(c.Worlds)) {
+		w := &WorldConfiguration{}
 		w = &c.Worlds[index]
+		return w, nil
 	}
-	return w, nil
+	return nil, errors.New(fmt.Sprintf("Index out of bounds: %d", index))
 }

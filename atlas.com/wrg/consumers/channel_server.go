@@ -1,43 +1,42 @@
 package consumers
 
 import (
-	"atlas-wrg/attributes"
 	"atlas-wrg/events"
+	"atlas-wrg/processor"
 	"atlas-wrg/registries"
 	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/segmentio/kafka-go"
-	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 )
 
-func Consume(ctx context.Context) {
-	resp, err := http.Get("http://atlas-nginx:80/ms/tds/topics/TOPIC_CHANNEL_SERVICE")
+type ChannelServer struct {
+	l   *log.Logger
+	ctx context.Context
+}
+
+func NewChannelServer(l *log.Logger, ctx context.Context) *ChannelServer {
+	return &ChannelServer{l, ctx}
+}
+
+func (c *ChannelServer) Init() {
+	t := processor.NewTopic(c.l)
+	td, err := t.GetTopic("TOPIC_CHANNEL_SERVICE")
 	if err != nil {
-		// handle error
-		fmt.Println(err)
+		c.l.Fatal("[ERROR] Unable to retrieve topic for consumer.")
 	}
 
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-
-	var response attributes.TopicDataContainer
-	err = json.Unmarshal(body, &response)
-
-	if err != nil {
-		log.Fatal("Could not unmarshal event into response class ", body)
-	}
+	fmt.Print(td)
 
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers: []string{os.Getenv("BOOTSTRAP_SERVERS")},
-		Topic:   response.Data.Attributes.Name,
+		Topic:   td.Attributes.Name,
 		GroupID: "World Registry",
 	})
 	for {
-		msg, err := r.ReadMessage(ctx)
+		msg, err := r.ReadMessage(c.ctx)
 		if err != nil {
 			panic("Could not successfully read message " + err.Error())
 		}
@@ -45,19 +44,19 @@ func Consume(ctx context.Context) {
 		var event events.ChannelServerEvent
 		err = json.Unmarshal(msg.Value, &event)
 		if err != nil {
-			log.Println("Could not unmarshal event into event class ", msg.Value)
+			c.l.Println("Could not unmarshal event into event class ", msg.Value)
 		} else {
-			processEvent(event)
+			c.processEvent(event)
 		}
 	}
 }
 
-func processEvent(event events.ChannelServerEvent) {
+func (c *ChannelServer) processEvent(event events.ChannelServerEvent) {
 	if event.Status == "STARTED" {
 		registries.GetChannelRegistry().Register(event.WorldId, event.ChannelId, event.IpAddress, event.Port)
 	} else if event.Status == "SHUTDOWN" {
 		registries.GetChannelRegistry().RemoveByWorldAndChannel(event.WorldId, event.ChannelId)
 	} else {
-		log.Println("Unhandled event status ", event.Status)
+		c.l.Println("Unhandled event status ", event.Status)
 	}
 }
