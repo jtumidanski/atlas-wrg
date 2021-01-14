@@ -10,6 +10,7 @@ import (
 	"github.com/segmentio/kafka-go"
 	"log"
 	"os"
+	"time"
 )
 
 type ChannelServer struct {
@@ -34,6 +35,7 @@ func (c *ChannelServer) Init() {
 		Brokers: []string{os.Getenv("BOOTSTRAP_SERVERS")},
 		Topic:   td.Attributes.Name,
 		GroupID: "World Registry",
+		MaxWait: 50 * time.Millisecond,
 	})
 	for {
 		msg, err := r.ReadMessage(c.ctx)
