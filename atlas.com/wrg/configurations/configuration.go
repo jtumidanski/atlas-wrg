@@ -3,16 +3,16 @@ package configurations
 import (
 	"errors"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"log"
 )
 
 type Configurator struct {
-	l *log.Logger
+	l logrus.FieldLogger
 }
 
-func NewConfigurator(l *log.Logger) *Configurator {
+func NewConfigurator(l logrus.FieldLogger) *Configurator {
 	return &Configurator{l}
 }
 

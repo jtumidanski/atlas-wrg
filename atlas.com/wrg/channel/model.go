@@ -1,4 +1,4 @@
-package models
+package channel
 
 type ChannelServer struct {
 	uniqueId  int
