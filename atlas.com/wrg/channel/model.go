@@ -1,6 +1,6 @@
 package channel
 
-type ChannelServer struct {
+type Model struct {
 	uniqueId  int
 	worldId   byte
 	channelId byte
@@ -8,28 +8,28 @@ type ChannelServer struct {
 	port      int
 }
 
-func (c ChannelServer) UniqueId() int {
+func (c Model) UniqueId() int {
 	return c.uniqueId
 }
 
-func (c ChannelServer) WorldId() byte {
+func (c Model) WorldId() byte {
 	return c.worldId
 }
 
-func (c ChannelServer) ChannelId() byte {
+func (c Model) ChannelId() byte {
 	return c.channelId
 }
 
-func (c ChannelServer) IpAddress() string {
+func (c Model) IpAddress() string {
 	return c.ipAddress
 }
 
-func (c ChannelServer) Port() int {
+func (c Model) Port() int {
 	return c.port
 }
 
-func NewChannelServer(uniqueId int, worldId byte, channelId byte, ipAddress string, port int) ChannelServer {
-	return ChannelServer{
+func NewModel(uniqueId int, worldId byte, channelId byte, ipAddress string, port int) Model {
+	return Model{
 		uniqueId:  uniqueId,
 		worldId:   worldId,
 		channelId: channelId,

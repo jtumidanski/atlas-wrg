@@ -2,6 +2,7 @@ package consumers
 
 import (
 	"atlas-wrg/channel"
+	"atlas-wrg/kafka/handler"
 	"github.com/sirupsen/logrus"
 )
 
@@ -13,13 +14,13 @@ type channelServerEvent struct {
 	Port      int
 }
 
-func ChannelServerEventCreator() EmptyEventCreator {
+func ChannelServerEventCreator() handler.EmptyEventCreator {
 	return func() interface{} {
 		return &channelServerEvent{}
 	}
 }
 
-func HandleChannelServerEvent() EventProcessor {
+func HandleChannelServerEvent() handler.EventHandler {
 	return func(l logrus.FieldLogger, e interface{}) {
 		if event, ok := e.(*channelServerEvent); ok {
 			if event.Status == "STARTED" {

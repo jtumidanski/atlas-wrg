@@ -67,7 +67,7 @@ func UnregisterChannelServer(l *logrus.Logger) http.HandlerFunc {
 	}
 }
 
-func getChannelResponseObject(server ChannelServer) attributes.ChannelServerData {
+func getChannelResponseObject(server Model) attributes.ChannelServerData {
 	return attributes.ChannelServerData{
 		Id:   strconv.Itoa(server.UniqueId()),
 		Type: "com.atlas.wrg.rest.attribute.ChannelServerAttributes",

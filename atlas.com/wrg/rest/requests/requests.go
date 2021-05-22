@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	baseRequest string = "http://atlas-nginx:80"
+	BaseRequest string = "http://atlas-nginx:80"
 )
 
 func get(url string, resp interface{}) error {

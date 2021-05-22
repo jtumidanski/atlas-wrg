@@ -47,7 +47,7 @@ func GetChannel(l *logrus.Logger) http.HandlerFunc {
 	}
 }
 
-func getChannelResponseObject(server channel.ChannelServer) attributes.ChannelServerData {
+func getChannelResponseObject(server channel.Model) attributes.ChannelServerData {
 	return attributes.ChannelServerData{
 		Id:   strconv.Itoa(server.UniqueId()),
 		Type: "com.atlas.wrg.rest.attribute.ChannelServerAttributes",
@@ -153,7 +153,7 @@ func GetWorlds(l *logrus.Logger) http.HandlerFunc {
 	}
 }
 
-func mapDistinctWorldId(channelServers []channel.ChannelServer) []byte {
+func mapDistinctWorldId(channelServers []channel.Model) []byte {
 	m := make(map[byte]struct{})
 	for _, element := range channelServers {
 		m[element.WorldId()] = struct{}{}

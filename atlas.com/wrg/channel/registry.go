@@ -6,7 +6,7 @@ import (
 
 type Registry struct {
 	mutex   sync.Mutex
-	servers []ChannelServer
+	servers []Model
 }
 
 var channelRegistry *Registry
@@ -21,10 +21,10 @@ func GetChannelRegistry() *Registry {
 	return channelRegistry
 }
 
-func (c *Registry) Register(worldId byte, channelId byte, ipAddress string, port int) ChannelServer {
+func (c *Registry) Register(worldId byte, channelId byte, ipAddress string, port int) Model {
 	c.mutex.Lock()
 
-	var found *ChannelServer = nil
+	var found *Model = nil
 	for i := 0; i < len(c.servers); i++ {
 		if c.servers[i].WorldId() == worldId && c.servers[i].ChannelId() == channelId {
 			found = &c.servers[i]
@@ -48,13 +48,13 @@ func (c *Registry) Register(worldId byte, channelId byte, ipAddress string, port
 		uniqueId = currentUniqueId
 	}
 
-	var newChannelServer = NewChannelServer(uniqueId, worldId, channelId, ipAddress, port)
+	var newChannelServer = NewModel(uniqueId, worldId, channelId, ipAddress, port)
 	c.servers = append(c.servers, newChannelServer)
 	c.mutex.Unlock()
 	return newChannelServer
 }
 
-func existingIds(channelServers []ChannelServer) []int {
+func existingIds(channelServers []Model) []int {
 	var ids []int
 	for _, x := range channelServers {
 		ids = append(ids, x.UniqueId())
@@ -71,12 +71,12 @@ func contains(ids []int, id int) bool {
 	return false
 }
 
-func (c *Registry) ChannelServers() []ChannelServer {
+func (c *Registry) ChannelServers() []Model {
 	servers := c.servers
 	return servers
 }
 
-func (c *Registry) ChannelServer(worldId byte, channelId byte) *ChannelServer {
+func (c *Registry) ChannelServer(worldId byte, channelId byte) *Model {
 	for _, x := range c.ChannelServers() {
 		if x.WorldId() == worldId && x.ChannelId() == channelId {
 			return &x
@@ -106,7 +106,7 @@ func (c *Registry) RemoveByWorldAndChannel(worldId byte, channelId byte) {
 	c.mutex.Unlock()
 }
 
-func indexOf(uniqueId int, data []ChannelServer) int {
+func indexOf(uniqueId int, data []Model) int {
 	for k, v := range data {
 		if uniqueId == v.UniqueId() {
 			return k
@@ -115,7 +115,7 @@ func indexOf(uniqueId int, data []ChannelServer) int {
 	return -1 //not found.
 }
 
-func remove(s []ChannelServer, i int) []ChannelServer {
+func remove(s []Model, i int) []Model {
 	s[i] = s[len(s)-1]
 	return s[:len(s)-1]
 }
