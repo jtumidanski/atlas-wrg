@@ -3,20 +3,45 @@ package rest
 import (
 	"atlas-wrg/channel"
 	"atlas-wrg/world"
+	"context"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"log"
 	"net/http"
-	"os"
+	"sync"
 	"time"
 )
 
-type Server struct {
-	l  *logrus.Logger
-	hs *http.Server
+type ConfigFunc func(config *Config)
+
+type Config struct {
+	readTimeout  time.Duration
+	writeTimeout time.Duration
+	idleTimeout  time.Duration
+	addr         string
 }
 
-func NewServer(l *logrus.Logger) *Server {
+func NewServer(cl *logrus.Logger, ctx context.Context, wg *sync.WaitGroup, configurators ...ConfigFunc) {
+	l := cl.WithFields(logrus.Fields{"originator": "HTTPServer"})
+	w := cl.Writer()
+	defer func() {
+		err := w.Close()
+		if err != nil {
+			l.WithError(err).Errorf("Closing log writer.")
+		}
+	}()
+
+	config := &Config{
+		readTimeout:  time.Duration(5) * time.Second,
+		writeTimeout: time.Duration(10) * time.Second,
+		idleTimeout:  time.Duration(120) * time.Second,
+		addr:         ":8080",
+	}
+
+	for _, configurator := range configurators {
+		configurator(config)
+	}
+
 	router := mux.NewRouter().StrictSlash(true).PathPrefix("/ms/wrg").Subrouter()
 	router.Use(commonHeader)
 
@@ -30,26 +55,35 @@ func NewServer(l *logrus.Logger) *Server {
 	wRouter.HandleFunc("/{worldId}", world.GetWorld(l)).Methods(http.MethodGet)
 	wRouter.HandleFunc("/{worldId}/channels/{channelId}", world.GetChannel(l)).Methods(http.MethodGet)
 
-	w := l.Writer()
-	defer w.Close()
-
 	hs := http.Server{
-		Addr:         ":8080",
+		Addr:         config.addr,
 		Handler:      router,
-		ErrorLog:     log.New(w, "", 0), // set the logger for the server
-		ReadTimeout:  5 * time.Second,   // max time to read request from the client
-		WriteTimeout: 10 * time.Second,  // max time to write response to the client
-		IdleTimeout:  120 * time.Second, // max time for connections using TCP Keep-Alive
+		ErrorLog:     log.New(w, "", 0),
+		ReadTimeout:  config.readTimeout,
+		WriteTimeout: config.writeTimeout,
+		IdleTimeout:  config.idleTimeout,
 	}
-	return &Server{l, &hs}
-}
 
-func (s *Server) Run() {
-	s.l.Infoln("Starting server on port 8080")
-	err := s.hs.ListenAndServe()
+	l.Infoln("Starting server on port 8080")
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	go func() {
+		wg.Add(1)
+		defer wg.Done()
+		err := hs.ListenAndServe()
+		if err != http.ErrServerClosed {
+			l.WithError(err).Errorf("Error while serving.")
+			return
+		}
+	}()
+
+	<-ctx.Done()
+	l.Infof("Shutting down server on port 8080")
+	err := hs.Close()
 	if err != nil {
-		s.l.Errorf("Starting server: %s\n", err)
-		os.Exit(1)
+		l.WithError(err).Errorf("Error shutting down HTTP service.")
 	}
 }
 

@@ -4,16 +4,23 @@ import (
 	"atlas-wrg/kafka/consumers"
 	"atlas-wrg/logger"
 	"atlas-wrg/rest"
+	"context"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 )
 
 func main() {
 	l := logger.CreateLogger()
+	l.Infoln("Starting main service.")
 
-	consumers.CreateEventConsumers(l)
-	rest.CreateRestService(l)
+	wg := &sync.WaitGroup{}
+	ctx, cancel := context.WithCancel(context.Background())
+
+	consumers.CreateEventConsumers(l, ctx, wg)
+
+	rest.CreateRestService(l, ctx, wg)
 
 	// trap sigterm or interrupt and gracefully shutdown the server
 	c := make(chan os.Signal, 1)
@@ -21,6 +28,8 @@ func main() {
 
 	// Block until a signal is received.
 	sig := <-c
-	l.Infoln("Shutting down via signal:", sig)
+	l.Infof("Initiating shutdown with signal %s.", sig)
+	cancel()
+	wg.Wait()
+	l.Infoln("Service shutdown.")
 }
-

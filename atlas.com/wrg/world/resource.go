@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-func GetChannel(l *logrus.Logger) http.HandlerFunc {
+func GetChannel(l logrus.FieldLogger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		value, err := strconv.Atoi(vars["worldId"])
@@ -68,7 +68,7 @@ func getChannelResponseObject(server channel.Model) attributes.ChannelServerData
 //  404: notFoundResponse
 
 // GetWorld handles GET requests
-func GetWorld(l *logrus.Logger) http.HandlerFunc {
+func GetWorld(l logrus.FieldLogger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		value, err := strconv.Atoi(vars["worldId"])
@@ -95,7 +95,7 @@ func GetWorld(l *logrus.Logger) http.HandlerFunc {
 	}
 }
 
-func getWorldResponseObject(l *logrus.Logger, worldId byte) (*attributes.WorldData, error) {
+func getWorldResponseObject(l logrus.FieldLogger, worldId byte) (*attributes.WorldData, error) {
 	c, err := configurations.NewConfigurator(l).GetConfiguration()
 	if err != nil {
 		return nil, err
@@ -128,7 +128,7 @@ func getWorldResponseObject(l *logrus.Logger, worldId byte) (*attributes.WorldDa
 //	200: worldServersResponse
 
 // GetWorlds handles GET requests
-func GetWorlds(l *logrus.Logger) http.HandlerFunc {
+func GetWorlds(l logrus.FieldLogger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var response attributes.WorldListDataContainer
 		response.Data = make([]attributes.WorldData, 0)

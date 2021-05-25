@@ -1,10 +1,11 @@
 package rest
 
 import (
+	"context"
 	"github.com/sirupsen/logrus"
+	"sync"
 )
 
-func CreateRestService(l *logrus.Logger) {
-	rs := NewServer(l)
-	go rs.Run()
+func CreateRestService(l *logrus.Logger, ctx context.Context, wg *sync.WaitGroup) {
+	go NewServer(l, ctx, wg)
 }

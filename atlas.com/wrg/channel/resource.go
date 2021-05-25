@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-func GetChannelServers(l *logrus.Logger) http.HandlerFunc {
+func GetChannelServers(l logrus.FieldLogger) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		var response attributes.ChannelServerListDataContainer
 		response.Data = make([]attributes.ChannelServerData, 0)
@@ -27,7 +27,7 @@ func GetChannelServers(l *logrus.Logger) http.HandlerFunc {
 	}
 }
 
-func RegisterChannelServer(l *logrus.Logger) http.HandlerFunc {
+func RegisterChannelServer(l logrus.FieldLogger) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		cs := &attributes.InputChannelServer{}
 		err := attributes.FromJSON(cs, r.Body)
@@ -52,7 +52,7 @@ func RegisterChannelServer(l *logrus.Logger) http.HandlerFunc {
 	}
 }
 
-func UnregisterChannelServer(l *logrus.Logger) http.HandlerFunc {
+func UnregisterChannelServer(l logrus.FieldLogger) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		value, err := strconv.Atoi(vars["channelId"])
