@@ -2,7 +2,6 @@ package channel
 
 import (
 	"atlas-wrg/json"
-	"atlas-wrg/rest/attributes"
 	"atlas-wrg/rest/resource"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
@@ -12,15 +11,15 @@ import (
 
 func GetChannelServers(l logrus.FieldLogger) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		var response attributes.ChannelServerListDataContainer
-		response.Data = make([]attributes.ChannelServerData, 0)
+		var response DataListContainer
+		response.Data = make([]DataBody, 0)
 
 		for _, x := range GetChannelRegistry().ChannelServers() {
 			var serverData = getChannelResponseObject(x)
 			response.Data = append(response.Data, serverData)
 		}
 
-		err := attributes.ToJSON(response, rw)
+		err := json.ToJSON(response, rw)
 		if err != nil {
 			l.WithError(err).Errorf("Encoding response")
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -30,8 +29,8 @@ func GetChannelServers(l logrus.FieldLogger) http.HandlerFunc {
 
 func RegisterChannelServer(l logrus.FieldLogger) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		cs := &attributes.InputChannelServer{}
-		err := attributes.FromJSON(cs, r.Body)
+		cs := &InputDataContainer{}
+		err := json.FromJSON(cs, r.Body)
 		if err != nil {
 			l.WithError(err).Errorf("Deserializing channel server")
 			rw.WriteHeader(http.StatusBadRequest)
@@ -42,9 +41,9 @@ func RegisterChannelServer(l logrus.FieldLogger) http.HandlerFunc {
 		server := GetChannelRegistry().Register(cs.Data.Attributes.WorldId,
 			cs.Data.Attributes.ChannelId, cs.Data.Attributes.IpAddress, cs.Data.Attributes.Port)
 
-		var response attributes.ChannelServerDataContainer
+		var response DataContainer
 		response.Data = getChannelResponseObject(server)
-		err = attributes.ToJSON(response, rw)
+		err = json.ToJSON(response, rw)
 		if err != nil {
 			l.WithError(err).Errorf("Writing response")
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -68,11 +67,11 @@ func UnregisterChannelServer(l logrus.FieldLogger) http.HandlerFunc {
 	}
 }
 
-func getChannelResponseObject(server Model) attributes.ChannelServerData {
-	return attributes.ChannelServerData{
+func getChannelResponseObject(server Model) DataBody {
+	return DataBody{
 		Id:   strconv.Itoa(server.UniqueId()),
 		Type: "com.atlas.wrg.rest.attribute.ChannelServerAttributes",
-		Attributes: attributes.ChannelServerAttributes{
+		Attributes: Attributes{
 			WorldId:   server.WorldId(),
 			ChannelId: server.ChannelId(),
 			Capacity:  0,

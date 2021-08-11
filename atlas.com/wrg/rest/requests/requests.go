@@ -1,7 +1,7 @@
 package requests
 
 import (
-	"atlas-wrg/rest/attributes"
+	json2 "atlas-wrg/json"
 	"bytes"
 	"encoding/json"
 	"net/http"
@@ -46,7 +46,7 @@ func delete(url string) (*http.Response, error) {
 }
 
 func processResponse(r *http.Response, rb interface{}) error {
-	err := attributes.FromJSON(rb, r.Body)
+	err := json2.FromJSON(rb, r.Body)
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func processResponse(r *http.Response, rb interface{}) error {
 
 func processErrorResponse(r *http.Response, eb interface{}) error {
 	if r.ContentLength > 0 {
-		err := attributes.FromJSON(eb, r.Body)
+		err := json2.FromJSON(eb, r.Body)
 		if err != nil {
 			return err
 		}

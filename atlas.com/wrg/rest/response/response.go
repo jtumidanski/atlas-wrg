@@ -1,44 +1,30 @@
-package attributes
+package response
 
 import (
 	"encoding/json"
-	"io"
 )
-
-// ToJSON serializes the given interface into a string based JSON format
-func ToJSON(i interface{}, w io.Writer) error {
-	e := json.NewEncoder(w)
-	return e.Encode(i)
-}
-
-// FromJSON deserializes the object from JSON string
-// in an io.Reader to the given interface
-func FromJSON(i interface{}, r io.Reader) error {
-	d := json.NewDecoder(r)
-	return d.Decode(i)
-}
 
 // objectMap is a simple representation of a json map. key is a string, and value is a nested object
 type objectMap map[string]interface{}
 
-// objectMapper maps a objectMap to a concrete data type
-type objectMapper func(objectMap) interface{}
+// ObjectMapper maps a objectMap to a concrete data type
+type ObjectMapper func(objectMap) interface{}
 
-// conditionalMapperProvider returns a string representing the type of object the objectMapper handles, as well as the
-// objectMapper itself.
-type conditionalMapperProvider func() (string, objectMapper)
+// ConditionalMapperProvider returns a string representing the type of object the ObjectMapper handles, as well as the
+// ObjectMapper itself.
+type ConditionalMapperProvider func() (string, ObjectMapper)
 
 // concreteObjectProvider returns a new (empty) concrete object
 type concreteObjectProvider func() interface{}
 
-// dataSegment is a slice of concrete objects
-type dataSegment []interface{}
+// DataSegment is a slice of concrete objects
+type DataSegment []interface{}
 
-// unmarshalRoot will take a raw byte array, and using mapper functions, produce a data dataSegment and includes
-// dataSegment representing a jsonapi.org request response
-func unmarshalRoot(data []byte, root objectMapper, options ...conditionalMapperProvider) (dataSegment, dataSegment, error) {
-	var dataResult dataSegment
-	var includeResult dataSegment
+// UnmarshalRoot will take a raw byte array, and using mapper functions, produce a data DataSegment and includes
+// DataSegment representing a jsonapi.org request response
+func UnmarshalRoot(data []byte, root ObjectMapper, options ...ConditionalMapperProvider) (DataSegment, DataSegment, error) {
+	var dataResult DataSegment
+	var includeResult DataSegment
 
 	var single = struct {
 		Data     objectMap
@@ -64,20 +50,20 @@ func unmarshalRoot(data []byte, root objectMapper, options ...conditionalMapperP
 	}
 }
 
-// includeMapper represents a objectMapper for handling the jsonapi.org includes data section
-func includeMapper(options ...conditionalMapperProvider) objectMapper {
+// includeMapper represents a ObjectMapper for handling the jsonapi.org includes data section
+func includeMapper(options ...ConditionalMapperProvider) ObjectMapper {
 	return func(o objectMap) interface{} {
 		return addInclude(o, options...)
 	}
 }
 
-// produceSingle will produce a dataSegment given a single objectMap from a objectMapper
-func produceSingle(o objectMap, m objectMapper) dataSegment {
+// produceSingle will produce a DataSegment given a single objectMap from a ObjectMapper
+func produceSingle(o objectMap, m ObjectMapper) DataSegment {
 	return append(make([]interface{}, 0), m(o))
 }
 
-// produceList will produce a dataSegment given a objectMap slice from a objectMapper
-func produceList(o []objectMap, m objectMapper) dataSegment {
+// produceList will produce a DataSegment given a objectMap slice from a ObjectMapper
+func produceList(o []objectMap, m ObjectMapper) DataSegment {
 	if len(o) > 0 {
 		var result = make([]interface{}, 0)
 		for _, x := range o {
@@ -101,19 +87,19 @@ func transformMap(dpf concreteObjectProvider, x objectMap) interface{} {
 	return nil
 }
 
-func mapperFunc(dpf concreteObjectProvider) objectMapper {
+func MapperFunc(dpf concreteObjectProvider) ObjectMapper {
 	return func(x objectMap) interface{} {
 		return transformMap(dpf, x)
 	}
 }
 
-func unmarshalData(tf string, dpf concreteObjectProvider) (string, objectMapper) {
-	return tf, mapperFunc(dpf)
+func UnmarshalData(tf string, dpf concreteObjectProvider) (string, ObjectMapper) {
+	return tf, MapperFunc(dpf)
 }
 
 // addInclude processes a map structure representing the jsonapi.org data object to produce a concrete struct.
 // given a set of functions which could produce a concrete struct
-func addInclude(x objectMap, options ...conditionalMapperProvider) interface{} {
+func addInclude(x objectMap, options ...ConditionalMapperProvider) interface{} {
 	t := x["type"].(string)
 	for _, o := range options {
 		tf, mf := o()

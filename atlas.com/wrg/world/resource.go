@@ -3,7 +3,7 @@ package world
 import (
 	"atlas-wrg/channel"
 	"atlas-wrg/configurations"
-	"atlas-wrg/rest/attributes"
+	"atlas-wrg/json"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"net/http"
@@ -36,9 +36,9 @@ func GetChannel(l logrus.FieldLogger) http.HandlerFunc {
 			return
 		}
 
-		var response attributes.ChannelServerDataContainer
+		var response channel.DataContainer
 		response.Data = getChannelResponseObject(*server)
-		err = attributes.ToJSON(response, w)
+		err = json.ToJSON(response, w)
 		if err != nil {
 			l.WithError(err).Errorf("Writing GetChannel output")
 			w.WriteHeader(http.StatusInternalServerError)
@@ -47,11 +47,11 @@ func GetChannel(l logrus.FieldLogger) http.HandlerFunc {
 	}
 }
 
-func getChannelResponseObject(server channel.Model) attributes.ChannelServerData {
-	return attributes.ChannelServerData{
+func getChannelResponseObject(server channel.Model) channel.DataBody {
+	return channel.DataBody{
 		Id:   strconv.Itoa(server.UniqueId()),
 		Type: "com.atlas.wrg.rest.attribute.ChannelServerAttributes",
-		Attributes: attributes.ChannelServerAttributes{
+		Attributes: channel.Attributes{
 			WorldId:   server.WorldId(),
 			ChannelId: server.ChannelId(),
 			Capacity:  0,
@@ -78,9 +78,9 @@ func GetWorld(l logrus.FieldLogger) http.HandlerFunc {
 			return
 		}
 
-		response := attributes.NewWorldDataContainer(*rd)
+		response := &DataContainer{Data: *rd}
 
-		err = attributes.ToJSON(response, w)
+		err = json.ToJSON(response, w)
 		if err != nil {
 			l.WithError(err).Errorf("Writing GetWorld output")
 			w.WriteHeader(http.StatusInternalServerError)
@@ -88,7 +88,7 @@ func GetWorld(l logrus.FieldLogger) http.HandlerFunc {
 	}
 }
 
-func getWorldResponseObject(l logrus.FieldLogger, worldId byte) (*attributes.WorldData, error) {
+func getWorldResponseObject(l logrus.FieldLogger, worldId byte) (*DataBody, error) {
 	c, err := configurations.NewConfigurator(l).GetConfiguration()
 	if err != nil {
 		return nil, err
@@ -100,10 +100,10 @@ func getWorldResponseObject(l logrus.FieldLogger, worldId byte) (*attributes.Wor
 		return nil, err
 	}
 
-	return &attributes.WorldData{
+	return &DataBody{
 		Id:   strconv.Itoa(int(worldId)),
 		Type: "com.atlas.wrg.rest.attribute.WorldAttributes",
-		Attributes: attributes.WorldAttributes{
+		Attributes: Attributes{
 			Name:               wc.Name,
 			Flag:               getFlag(wc.Flag),
 			Message:            wc.ServerMessage,
@@ -117,8 +117,8 @@ func getWorldResponseObject(l logrus.FieldLogger, worldId byte) (*attributes.Wor
 
 func GetWorlds(l logrus.FieldLogger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var response attributes.WorldListDataContainer
-		response.Data = make([]attributes.WorldData, 0)
+		var response DataListContainer
+		response.Data = make([]DataBody, 0)
 
 		worldIds := mapDistinctWorldId(channel.GetChannelRegistry().ChannelServers())
 		for _, id := range worldIds {
@@ -131,7 +131,7 @@ func GetWorlds(l logrus.FieldLogger) http.HandlerFunc {
 			response.Data = append(response.Data, *rd)
 		}
 
-		err := attributes.ToJSON(response, w)
+		err := json.ToJSON(response, w)
 		if err != nil {
 			l.WithError(err).Errorf("Writing GetWorlds output")
 			w.WriteHeader(http.StatusInternalServerError)
