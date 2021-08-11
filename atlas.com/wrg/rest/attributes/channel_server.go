@@ -4,16 +4,12 @@ type InputChannelServer struct {
 	Data ChannelServerData `json:"data"`
 }
 
-// A list of channelServers
-// swagger:response channelServersResponse
 type ChannelServerListDataContainer struct {
 	// All channel servers
 	// in: body
 	Data []ChannelServerData `json:"data"`
 }
 
-// A channelServer
-// swagger:response channelServerResponse
 type ChannelServerDataContainer struct {
 	// A channel server
 	// in: body

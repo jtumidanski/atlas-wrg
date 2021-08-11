@@ -1,14 +1,10 @@
 package attributes
 
-// A list of worldServers
-// swagger:response worldServersResponse
 type WorldListDataContainer struct {
 	// All world servers
 	Data []WorldData `json:"data"`
 }
 
-// A worldServer
-// swagger:response worldServerResponse
 type WorldDataContainer struct {
 	// A world server
 	Data WorldData `json:"data"`
@@ -18,14 +14,12 @@ func NewWorldDataContainer(wd WorldData) *WorldDataContainer {
 	return &WorldDataContainer{wd}
 }
 
-// swagger:model worldServerData
 type WorldData struct {
 	Id         string          `json:"id"`
 	Type       string          `json:"type"`
 	Attributes WorldAttributes `json:"attributes"`
 }
 
-// swagger:model worldServerAttributes
 type WorldAttributes struct {
 	Name               string `json:"name"`
 	Flag               int    `json:"flag"`

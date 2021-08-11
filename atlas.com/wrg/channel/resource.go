@@ -1,6 +1,7 @@
 package channel
 
 import (
+	"atlas-wrg/json"
 	"atlas-wrg/rest/attributes"
 	"atlas-wrg/rest/resource"
 	"github.com/gorilla/mux"
@@ -34,7 +35,7 @@ func RegisterChannelServer(l logrus.FieldLogger) http.HandlerFunc {
 		if err != nil {
 			l.WithError(err).Errorf("Deserializing channel server")
 			rw.WriteHeader(http.StatusBadRequest)
-			attributes.ToJSON(&resource.GenericError{Message: err.Error()}, rw)
+			json.ToJSON(&resource.GenericError{Message: err.Error()}, rw)
 			return
 		}
 

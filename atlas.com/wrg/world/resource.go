@@ -61,13 +61,6 @@ func getChannelResponseObject(server channel.Model) attributes.ChannelServerData
 	}
 }
 
-// swagger:route GET /worlds/{worldId} worlds getWorld
-// Retrieves world server information.
-// responses:
-//	200: worldServerResponse
-//  404: notFoundResponse
-
-// GetWorld handles GET requests
 func GetWorld(l logrus.FieldLogger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -122,12 +115,6 @@ func getWorldResponseObject(l logrus.FieldLogger, worldId byte) (*attributes.Wor
 	}, nil
 }
 
-// swagger:route GET /worlds worlds getWorlds
-// Retrieves all world server information.
-// responses:
-//	200: worldServersResponse
-
-// GetWorlds handles GET requests
 func GetWorlds(l logrus.FieldLogger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var response attributes.WorldListDataContainer
