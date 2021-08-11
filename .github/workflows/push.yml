@@ -10,7 +10,7 @@ jobs:
         run:                echo WORK_DIR=$(echo $GITHUB_REPOSITORY | grep -Eo 'atlas-(.*)' | cut -f2- -d- | perl -ne 'print "./atlas.com/$_"') >> $GITHUB_ENV
       - name:               Run Unit Tests
         working-directory:  ${{ env.WORK_DIR }}
-        run:                go test
+        run:                go test ./...
 
   deploy:
     runs-on:                ubuntu-latest
