@@ -1,10 +1,9 @@
 package rest
 
 import (
-	"atlas-wrg/channel"
-	"atlas-wrg/world"
 	"context"
-	"github.com/gorilla/mux"
+	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/ext"
 	"github.com/sirupsen/logrus"
 	"log"
 	"net/http"
@@ -21,7 +20,7 @@ type Config struct {
 	addr         string
 }
 
-func NewServer(cl *logrus.Logger, ctx context.Context, wg *sync.WaitGroup, configurators ...ConfigFunc) {
+func NewServer(cl *logrus.Logger, ctx context.Context, wg *sync.WaitGroup, routerProducer func(l logrus.FieldLogger) http.Handler, configurators ...ConfigFunc) {
 	l := cl.WithFields(logrus.Fields{"originator": "HTTPServer"})
 	w := cl.Writer()
 	defer func() {
@@ -42,22 +41,9 @@ func NewServer(cl *logrus.Logger, ctx context.Context, wg *sync.WaitGroup, confi
 		configurator(config)
 	}
 
-	router := mux.NewRouter().StrictSlash(true).PathPrefix("/ms/wrg").Subrouter()
-	router.Use(commonHeader)
-
-	csRouter := router.PathPrefix("/channelServers").Subrouter()
-	csRouter.HandleFunc("/", channel.GetChannelServers(l)).Methods(http.MethodGet)
-	csRouter.Handle("/", channel.RegisterChannelServer(l)).Methods(http.MethodPost)
-	csRouter.HandleFunc("/{channelId}", channel.UnregisterChannelServer(l)).Methods(http.MethodDelete)
-
-	wRouter := router.PathPrefix("/worlds").Subrouter()
-	wRouter.HandleFunc("/", world.GetWorlds(l)).Methods(http.MethodGet)
-	wRouter.HandleFunc("/{worldId}", world.GetWorld(l)).Methods(http.MethodGet)
-	wRouter.HandleFunc("/{worldId}/channels/{channelId}", world.GetChannel(l)).Methods(http.MethodGet)
-
 	hs := http.Server{
 		Addr:         config.addr,
-		Handler:      router,
+		Handler:      routerProducer(l),
 		ErrorLog:     log.New(w, "", 0),
 		ReadTimeout:  config.readTimeout,
 		WriteTimeout: config.writeTimeout,
@@ -87,9 +73,21 @@ func NewServer(cl *logrus.Logger, ctx context.Context, wg *sync.WaitGroup, confi
 	}
 }
 
-func commonHeader(next http.Handler) http.Handler {
+func CommonHeader(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
 		next.ServeHTTP(w, r)
 	})
+}
+
+type SpanHandler func(opentracing.Span) http.HandlerFunc
+
+func RetrieveSpan(name string, next SpanHandler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		wireCtx, _ := opentracing.GlobalTracer().Extract(opentracing.HTTPHeaders, opentracing.HTTPHeadersCarrier(r.Header))
+		serverSpan := opentracing.StartSpan(name, ext.RPCServerOption(wireCtx))
+		defer serverSpan.Finish()
+
+		next(serverSpan)(w, r)
+	}
 }

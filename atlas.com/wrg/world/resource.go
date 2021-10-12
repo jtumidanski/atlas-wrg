@@ -10,6 +10,13 @@ import (
 	"strconv"
 )
 
+func InitResource(router *mux.Router, l logrus.FieldLogger) {
+	wRouter := router.PathPrefix("/worlds").Subrouter()
+	wRouter.HandleFunc("/", GetWorlds(l)).Methods(http.MethodGet)
+	wRouter.HandleFunc("/{worldId}", GetWorld(l)).Methods(http.MethodGet)
+	wRouter.HandleFunc("/{worldId}/channels/{channelId}", GetChannel(l)).Methods(http.MethodGet)
+}
+
 func GetChannel(l logrus.FieldLogger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)

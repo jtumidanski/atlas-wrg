@@ -3,6 +3,7 @@ package consumers
 import (
 	"atlas-wrg/channel"
 	"atlas-wrg/kafka/handler"
+	"github.com/opentracing/opentracing-go"
 	"github.com/sirupsen/logrus"
 )
 
@@ -21,7 +22,7 @@ func ChannelServerEventCreator() handler.EmptyEventCreator {
 }
 
 func HandleChannelServerEvent() handler.EventHandler {
-	return func(l logrus.FieldLogger, e interface{}) {
+	return func(l logrus.FieldLogger, span opentracing.Span, e interface{}) {
 		if event, ok := e.(*channelServerEvent); ok {
 			if event.Status == "STARTED" {
 				channel.GetChannelRegistry().Register(event.WorldId, event.ChannelId, event.IpAddress, event.Port)

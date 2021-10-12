@@ -9,6 +9,13 @@ import (
 	"strconv"
 )
 
+func InitResource(router *mux.Router, l logrus.FieldLogger) {
+	csRouter := router.PathPrefix("/channelServers").Subrouter()
+	csRouter.HandleFunc("/", GetChannelServers(l)).Methods(http.MethodGet)
+	csRouter.Handle("/", RegisterChannelServer(l)).Methods(http.MethodPost)
+	csRouter.HandleFunc("/{channelId}", UnregisterChannelServer(l)).Methods(http.MethodDelete)
+}
+
 func GetChannelServers(l logrus.FieldLogger) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		var response DataListContainer

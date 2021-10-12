@@ -31,7 +31,6 @@ WORKDIR /
 COPY --from=build-env /server /
 COPY --from=build-env /go/bin/dlv /
 COPY /atlas.com/wrg/config.yaml /
-COPY /atlas.com/wrg/swagger.yaml /
 
 # Run delve
 CMD ["/dlv", "--listen=:40000", "--headless=true", "--api-version=2", "--accept-multiclient", "exec", "/server"]

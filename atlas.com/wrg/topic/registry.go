@@ -1,6 +1,7 @@
 package topic
 
 import (
+	"github.com/opentracing/opentracing-go"
 	"github.com/sirupsen/logrus"
 	"sync"
 )
@@ -23,7 +24,7 @@ func GetRegistry() *registry {
 	return r
 }
 
-func (r *registry) Get(l logrus.FieldLogger, token string) string {
+func (r *registry) Get(l logrus.FieldLogger, span opentracing.Span, token string) string {
 	r.lock.RLock()
 	if val, ok := r.topics[token]; ok {
 		r.lock.RUnlock()
@@ -35,7 +36,7 @@ func (r *registry) Get(l logrus.FieldLogger, token string) string {
 			r.lock.Unlock()
 			return val
 		}
-		td, err := GetTopic(l)(token)
+		td, err := GetTopic(l, span)(token)
 		if err != nil {
 			r.lock.Unlock()
 			l.WithError(err).Fatalf("Unable to locate topic for token %s.", token)
