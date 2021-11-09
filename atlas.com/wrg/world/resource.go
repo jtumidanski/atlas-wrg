@@ -4,52 +4,100 @@ import (
 	"atlas-wrg/channel"
 	"atlas-wrg/configurations"
 	"atlas-wrg/json"
+	"atlas-wrg/rest"
 	"github.com/gorilla/mux"
+	"github.com/opentracing/opentracing-go"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 )
 
+const (
+	getWorlds  = "get_worlds"
+	getWorld   = "get_world"
+	getChannel = "get_channel"
+)
+
 func InitResource(router *mux.Router, l logrus.FieldLogger) {
 	wRouter := router.PathPrefix("/worlds").Subrouter()
-	wRouter.HandleFunc("/", GetWorlds(l)).Methods(http.MethodGet)
-	wRouter.HandleFunc("/{worldId}", GetWorld(l)).Methods(http.MethodGet)
-	wRouter.HandleFunc("/{worldId}/channels/{channelId}", GetChannel(l)).Methods(http.MethodGet)
+	wRouter.HandleFunc("/", registerGetWorlds(l)).Methods(http.MethodGet)
+	wRouter.HandleFunc("/{worldId}", registerGetWorld(l)).Methods(http.MethodGet)
+	wRouter.HandleFunc("/{worldId}/channels/{channelId}", registerGetChannel(l)).Methods(http.MethodGet)
 }
 
-func GetChannel(l logrus.FieldLogger) http.HandlerFunc {
+func registerGetChannel(l logrus.FieldLogger) http.HandlerFunc {
+	return rest.RetrieveSpan(getChannel, func(span opentracing.Span) http.HandlerFunc {
+		return parseWorldId(l, func(worldId byte) http.HandlerFunc {
+			return parseChannelId(l, func(channelId byte) http.HandlerFunc {
+				return GetChannel(l)(span)(worldId, channelId)
+			})
+		})
+	})
+}
+
+func registerGetWorld(l logrus.FieldLogger) http.HandlerFunc {
+	return rest.RetrieveSpan(getWorld, func(span opentracing.Span) http.HandlerFunc {
+		return parseWorldId(l, func(worldId byte) http.HandlerFunc {
+			return handleGetWorld(l)(span)(worldId)
+		})
+	})
+}
+
+func registerGetWorlds(l logrus.FieldLogger) http.HandlerFunc {
+	return rest.RetrieveSpan(getWorlds, func(span opentracing.Span) http.HandlerFunc {
+		return handleGetWorlds(l)(span)
+	})
+}
+
+type worldIdHandler func(worldId byte) http.HandlerFunc
+
+func parseWorldId(l logrus.FieldLogger, next worldIdHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
-		value, err := strconv.Atoi(vars["worldId"])
+		worldId, err := strconv.Atoi(vars["worldId"])
 		if err != nil {
-			l.WithError(err).Errorf("Error parsing worldId as integer")
+			l.WithError(err).Errorf("Error parsing worldId as byte")
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		worldId := byte(value)
+		next(byte(worldId))(w, r)
+	}
+}
 
-		vars = mux.Vars(r)
-		value, err = strconv.Atoi(vars["channelId"])
+type channelIdHandler func(channelId byte) http.HandlerFunc
+
+func parseChannelId(l logrus.FieldLogger, next channelIdHandler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		channelId, err := strconv.Atoi(vars["channelId"])
 		if err != nil {
-			l.WithError(err).Errorf("Error parsing channelId as integer")
+			l.WithError(err).Errorf("Error parsing channelId as byte")
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		channelId := byte(value)
+		next(byte(channelId))(w, r)
+	}
+}
 
-		server := channel.GetChannelRegistry().ChannelServer(worldId, channelId)
-		if server == nil {
-			w.WriteHeader(http.StatusNotFound)
-			return
-		}
+func GetChannel(l logrus.FieldLogger) func(span opentracing.Span) func(worldId byte, channelId byte) http.HandlerFunc {
+	return func(span opentracing.Span) func(worldId byte, channelId byte) http.HandlerFunc {
+		return func(worldId byte, channelId byte) http.HandlerFunc {
+			return func(w http.ResponseWriter, r *http.Request) {
+				server := channel.GetChannelRegistry().ChannelServer(worldId, channelId)
+				if server == nil {
+					w.WriteHeader(http.StatusNotFound)
+					return
+				}
 
-		var response channel.DataContainer
-		response.Data = getChannelResponseObject(*server)
-		err = json.ToJSON(response, w)
-		if err != nil {
-			l.WithError(err).Errorf("Writing GetChannel output")
-			w.WriteHeader(http.StatusInternalServerError)
-			return
+				var response channel.DataContainer
+				response.Data = getChannelResponseObject(*server)
+				err := json.ToJSON(response, w)
+				if err != nil {
+					l.WithError(err).Errorf("Writing output")
+					w.WriteHeader(http.StatusInternalServerError)
+					return
+				}
+			}
 		}
 	}
 }
@@ -68,29 +116,24 @@ func getChannelResponseObject(server channel.Model) channel.DataBody {
 	}
 }
 
-func GetWorld(l logrus.FieldLogger) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		value, err := strconv.Atoi(vars["worldId"])
-		if err != nil {
-			l.WithError(err).Errorf("Error parsing worldId as integer")
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		worldId := byte(value)
+func handleGetWorld(l logrus.FieldLogger) func(span opentracing.Span) func(worldId byte) http.HandlerFunc {
+	return func(span opentracing.Span) func(worldId byte) http.HandlerFunc {
+		return func(worldId byte) http.HandlerFunc {
+			return func(w http.ResponseWriter, r *http.Request) {
+				rd, err := getWorldResponseObject(l, worldId)
+				if err != nil {
+					w.WriteHeader(http.StatusNotFound)
+					return
+				}
 
-		rd, err := getWorldResponseObject(l, worldId)
-		if err != nil {
-			w.WriteHeader(http.StatusNotFound)
-			return
-		}
+				response := &DataContainer{Data: *rd}
 
-		response := &DataContainer{Data: *rd}
-
-		err = json.ToJSON(response, w)
-		if err != nil {
-			l.WithError(err).Errorf("Writing GetWorld output")
-			w.WriteHeader(http.StatusInternalServerError)
+				err = json.ToJSON(response, w)
+				if err != nil {
+					l.WithError(err).Errorf("Writing output")
+					w.WriteHeader(http.StatusInternalServerError)
+				}
+			}
 		}
 	}
 }
@@ -122,27 +165,29 @@ func getWorldResponseObject(l logrus.FieldLogger, worldId byte) (*DataBody, erro
 	}, nil
 }
 
-func GetWorlds(l logrus.FieldLogger) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var response DataListContainer
-		response.Data = make([]DataBody, 0)
+func handleGetWorlds(l logrus.FieldLogger) func(span opentracing.Span) http.HandlerFunc {
+	return func(span opentracing.Span) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			var response DataListContainer
+			response.Data = make([]DataBody, 0)
 
-		worldIds := mapDistinctWorldId(channel.GetChannelRegistry().ChannelServers())
-		for _, id := range worldIds {
-			rd, err := getWorldResponseObject(l, id)
+			worldIds := mapDistinctWorldId(channel.GetChannelRegistry().ChannelServers())
+			for _, id := range worldIds {
+				rd, err := getWorldResponseObject(l, id)
+				if err != nil {
+					l.WithError(err).Errorf("Unable to get response object")
+					w.WriteHeader(http.StatusInternalServerError)
+					return
+				}
+				response.Data = append(response.Data, *rd)
+			}
+
+			err := json.ToJSON(response, w)
 			if err != nil {
-				l.WithError(err).Errorf("Unable to get response object")
+				l.WithError(err).Errorf("Writing output")
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
-			response.Data = append(response.Data, *rd)
-		}
-
-		err := json.ToJSON(response, w)
-		if err != nil {
-			l.WithError(err).Errorf("Writing GetWorlds output")
-			w.WriteHeader(http.StatusInternalServerError)
-			return
 		}
 	}
 }
