@@ -106,7 +106,7 @@ func Post(l logrus.FieldLogger, span opentracing.Span) func(url string, input in
 			return err
 		}
 
-		if r.StatusCode != http.StatusNoContent && r.StatusCode != http.StatusOK && r.StatusCode != http.StatusAccepted {
+		if r.StatusCode != http.StatusNoContent && r.StatusCode != http.StatusCreated && r.StatusCode != http.StatusAccepted {
 			err = processErrorResponse(r, errResp)
 			if err != nil {
 				return err
