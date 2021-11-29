@@ -112,7 +112,7 @@ func Post(l logrus.FieldLogger, span opentracing.Span) func(url string, input in
 				return err
 			}
 
-			l.WithFields(logrus.Fields{"method": http.MethodPost, "status": r.Status, "path": url, "response": errResp}).Debugf("Printing request.")
+			l.WithFields(logrus.Fields{"method": http.MethodPost, "status": r.Status, "path": url, "input": input, "response": errResp}).Debugf("Printing request.")
 
 			return nil
 		}
@@ -122,9 +122,9 @@ func Post(l logrus.FieldLogger, span opentracing.Span) func(url string, input in
 			if err != nil {
 				return err
 			}
-			l.WithFields(logrus.Fields{"method": http.MethodPost, "status": r.Status, "path": url, "response": resp}).Debugf("Printing request.")
+			l.WithFields(logrus.Fields{"method": http.MethodPost, "status": r.Status, "path": url, "input": input, "response": resp}).Debugf("Printing request.")
 		} else {
-			l.WithFields(logrus.Fields{"method": http.MethodPost, "status": r.Status, "path": url, "response": ""}).Debugf("Printing request.")
+			l.WithFields(logrus.Fields{"method": http.MethodPost, "status": r.Status, "path": url, "input": input, "response": ""}).Debugf("Printing request.")
 		}
 
 		return nil
