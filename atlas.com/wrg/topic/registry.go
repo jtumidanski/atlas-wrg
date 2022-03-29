@@ -36,14 +36,16 @@ func (r *registry) Get(l logrus.FieldLogger, span opentracing.Span, token string
 			r.lock.Unlock()
 			return val
 		}
-		td, err := GetTopic(l, span)(token)
+		td, err := getTopic(token)(l, span)
 		if err != nil {
 			r.lock.Unlock()
 			l.WithError(err).Fatalf("Unable to locate topic for token %s.", token)
 			return ""
 		}
-		r.topics[token] = td.Attributes.Name
+		attr := td.Data().Attributes
+
+		r.topics[token] = attr.Name
 		r.lock.Unlock()
-		return td.Attributes.Name
+		return attr.Name
 	}
 }

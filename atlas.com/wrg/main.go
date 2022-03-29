@@ -2,7 +2,7 @@ package main
 
 import (
 	"atlas-wrg/channel"
-	"atlas-wrg/kafka/consumers"
+	"atlas-wrg/kafka"
 	"atlas-wrg/logger"
 	"atlas-wrg/rest"
 	"atlas-wrg/tracing"
@@ -16,6 +16,7 @@ import (
 )
 
 const serviceName = "atlas-wrg"
+const consumerGroupId = "World Registry Service"
 
 func main() {
 	l := logger.CreateLogger(serviceName)
@@ -35,7 +36,7 @@ func main() {
 		}
 	}(tc)
 
-	consumers.CreateEventConsumers(l, ctx, wg)
+	kafka.CreateConsumers(l, ctx, wg, channel.StatusConsumer(consumerGroupId))
 
 	rest.CreateService(l, ctx, wg, "/ms/wrg", channel.InitResource, world.InitResource)
 

@@ -2,6 +2,7 @@ package requests
 
 import (
 	json2 "atlas-wrg/json"
+	"atlas-wrg/rest/response"
 	"atlas-wrg/retry"
 	"bytes"
 	"encoding/json"
@@ -149,5 +150,91 @@ func processErrorResponse(r *http.Response, eb interface{}) error {
 		return nil
 	} else {
 		return nil
+	}
+}
+
+type DataContainer[A any] interface {
+	Data() DataBody[A]
+	DataList() []DataBody[A]
+	Length() int
+}
+
+type dataContainer[A any] struct {
+	data     response.DataSegment
+	included response.DataSegment
+}
+
+type DataBody[A any] struct {
+	Id         string `json:"id"`
+	Type       string `json:"type"`
+	Attributes A      `json:"attributes"`
+}
+
+func (c *dataContainer[A]) MarshalJSON() ([]byte, error) {
+	t := struct {
+		Data     interface{} `json:"data"`
+		Included interface{} `json:"included"`
+	}{}
+	if len(c.data) == 1 {
+		t.Data = c.data[0]
+	} else {
+		t.Data = c.data
+	}
+	return json.Marshal(t)
+}
+
+func (c *dataContainer[A]) UnmarshalJSON(data []byte) error {
+	d, i, err := response.UnmarshalRoot(data, response.MapperFunc(EmptyDataBody[A]))
+	if err != nil {
+		return err
+	}
+
+	c.data = d
+	c.included = i
+	return nil
+}
+
+func (c dataContainer[A]) Data() DataBody[A] {
+	if len(c.data) >= 1 {
+		return *c.data[0].(*DataBody[A])
+	}
+	return DataBody[A]{}
+}
+
+func (c dataContainer[A]) DataList() []DataBody[A] {
+	var r = make([]DataBody[A], 0)
+	for _, x := range c.data {
+		r = append(r, *x.(*DataBody[A]))
+	}
+	return r
+}
+
+func (c dataContainer[A]) Length() int {
+	return len(c.data)
+}
+
+func EmptyDataBody[A any]() interface{} {
+	return &DataBody[A]{}
+}
+
+type Request[A any] func(l logrus.FieldLogger, span opentracing.Span) (DataContainer[A], error)
+
+type PostRequest[A any] func(l logrus.FieldLogger, span opentracing.Span) (DataContainer[A], ErrorListDataContainer, error)
+
+func MakeGetRequest[A any](url string, configurators ...Configurator) Request[A] {
+	return func(l logrus.FieldLogger, span opentracing.Span) (DataContainer[A], error) {
+		r := dataContainer[A]{}
+		err := Get(l, span)(url, &r, configurators...)
+		return r, err
+	}
+}
+
+func MakePostRequest[A any](url string, i interface{}) PostRequest[A] {
+	return func(l logrus.FieldLogger, span opentracing.Span) (DataContainer[A], ErrorListDataContainer, error) {
+		r := dataContainer[A]{}
+		errResp := ErrorListDataContainer{}
+
+		err := Post(l, span)(url, i, r, &errResp)
+		return r, errResp, err
 	}
 }
