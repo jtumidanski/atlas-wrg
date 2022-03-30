@@ -25,7 +25,7 @@ func NewConsumerConfig[E any](name string, topicToken string, groupId string, ha
 		name:       name,
 		topicToken: topicToken,
 		groupId:    groupId,
-		maxWait:    500,
+		maxWait:    500 * time.Millisecond,
 		handler:    adapt(handler),
 	}
 }
@@ -113,9 +113,9 @@ func createConsumer(cl *logrus.Logger, ctx context.Context, wg *sync.WaitGroup, 
 		}
 	}()
 
-	l.Infof("Start consuming topic.")
+	l.Infof("Start consuming topic %s.", t)
 	<-ctx.Done()
-	l.Infof("Shutting down topic consumer.")
+	l.Infof("Shutting down topic %s consumer.", t)
 	if err := r.Close(); err != nil {
 		l.WithError(err).Errorf("Error closing reader.")
 	}
