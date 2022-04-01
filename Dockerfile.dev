@@ -18,11 +18,8 @@ RUN go build -o /server
 
 FROM alpine:3.15
 
-# Port 8080 belongs to our application, 40000 belongs to Delve
-EXPOSE 8080 40000
-
-# Allow delve to run on Alpine based containers.
-RUN apk add --no-cache libc6-compat
+# Port 8080 belongs to our application
+EXPOSE 8080
 
 WORKDIR /
 
