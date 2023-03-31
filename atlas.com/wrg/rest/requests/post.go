@@ -69,7 +69,7 @@ func MakePostRequest[A any](url string, i interface{}, configurators ...Configur
 		r := dataContainer[A]{includedMappers: c.mappers}
 		errResp := ErrorListDataContainer{}
 
-		err := post(l, span)(url, i, r, &errResp)
+		err := post(l, span)(url, i, &r, &errResp)
 		return r, errResp, err
 	}
 }
